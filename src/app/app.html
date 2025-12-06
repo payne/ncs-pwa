@@ -2,15 +2,14 @@
 
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #sidenav
-               [opened]="sidenavOpened"
-               (closed)="closeSidenav()"
+               [(opened)]="sidenavOpened"
                mode="over"
                class="sidenav">
     <mat-nav-list>
       <a mat-list-item
          *ngFor="let item of menuItems"
          [routerLink]="item.path"
-         (click)="closeSidenav()"
+         (click)="sidenavOpened = false"
          class="nav-item">
         <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
         <span matListItemTitle>{{ item.label }}</span>

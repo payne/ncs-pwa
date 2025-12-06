@@ -53,3 +53,6 @@ Duty should default to unassigned. Milage start to 0. classification to observer
 
 ### Prompt 10
 add an action to the table rows called checkout. It will update the time out field.
+
+### Prompt 11
+Assignments does not show up when clicking the hamburger menu. Please fix.
