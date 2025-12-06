@@ -1,0 +1,58 @@
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+}
+
+.menu-button {
+  margin-right: 16px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.status-indicators {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.clock {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.online-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.online-status mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.online-status.offline {
+  color: var(--color-danger);
+}
+
+.status-text {
+  font-size: 14px;
+}
+
+@media (max-width: 576px) {
+  .status-text {
+    display: none;
+  }
+
+  .clock {
+    font-size: 14px;
+  }
+}

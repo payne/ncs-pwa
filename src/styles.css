@@ -1,0 +1,70 @@
+/* You can add global styles to this file, and also import other style files */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+/* CSS Variables */
+:root {
+  --color-primary: #1e3a62;
+  --color-secondary: #5c7fa3;
+  --color-success: #28a745;
+  --color-warning: #fff200;
+  --color-danger: #dc3545;
+  --color-info: #17a2b8;
+  --color-light: #f8f9fa;
+  --color-dark: #343a40;
+  --color-white: #ffffff;
+  --color-black: #000000;
+}
+
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* Container Styles */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  color: var(--color-primary);
+  margin-bottom: 16px;
+}
+
+/* Responsive Media Queries */
+@media (min-width: 576px) {
+  .container {
+    padding: 24px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 32px;
+  }
+}
+
+@media (min-width: 992px) {
+  .container {
+    padding: 40px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    padding: 48px;
+  }
+}

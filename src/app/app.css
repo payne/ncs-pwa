@@ -1,0 +1,30 @@
+.sidenav-container {
+  height: 100vh;
+  padding-top: 64px;
+}
+
+.sidenav {
+  width: 250px;
+}
+
+.main-content {
+  padding: 20px;
+}
+
+.nav-item {
+  cursor: pointer;
+}
+
+.nav-item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 576px) {
+  .sidenav-container {
+    padding-top: 56px;
+  }
+
+  .main-content {
+    padding: 12px;
+  }
+}

@@ -1,0 +1,15 @@
+<mat-toolbar color="primary" class="top-bar">
+  <button mat-icon-button (click)="toggleMenu()" class="menu-button">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <span class="spacer"></span>
+
+  <div class="status-indicators">
+    <span class="clock">{{ currentTime }}</span>
+    <div class="online-status" [class.offline]="!isOnline">
+      <mat-icon>{{ isOnline ? 'wifi' : 'wifi_off' }}</mat-icon>
+      <span class="status-text">{{ isOnline ? 'Online' : 'Offline' }}</span>
+    </div>
+  </div>
+</mat-toolbar>
