@@ -163,18 +163,21 @@
         <th mat-header-cell *matHeaderCellDef>Actions</th>
         <td mat-cell *matCellDef="let assignment">
           <div *ngIf="!assignment.isEditing">
-            <button mat-icon-button color="primary" (click)="enableEdit(assignment)">
+            <button mat-icon-button color="accent" (click)="checkout(assignment)" matTooltip="Checkout">
+              <mat-icon>logout</mat-icon>
+            </button>
+            <button mat-icon-button color="primary" (click)="enableEdit(assignment)" matTooltip="Edit">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-icon-button color="warn" (click)="deleteAssignment(assignment)">
+            <button mat-icon-button color="warn" (click)="deleteAssignment(assignment)" matTooltip="Delete">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
           <div *ngIf="assignment.isEditing">
-            <button mat-icon-button color="primary" (click)="saveEdit(assignment)">
+            <button mat-icon-button color="primary" (click)="saveEdit(assignment)" matTooltip="Save">
               <mat-icon>check</mat-icon>
             </button>
-            <button mat-icon-button color="warn" (click)="cancelEdit(assignment)">
+            <button mat-icon-button color="warn" (click)="cancelEdit(assignment)" matTooltip="Cancel">
               <mat-icon>close</mat-icon>
             </button>
           </div>

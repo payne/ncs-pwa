@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { OperatorService } from '../_services/operator.service';
 import { NetAssignment } from '../_models/ncs-net-assignments.model';
 import { Operator } from '../_models/operator.model';
@@ -26,7 +27,8 @@ import { Operator } from '../_models/operator.model';
     MatIconModule,
     MatFormFieldModule,
     MatAutocompleteModule,
-    MatSelectModule
+    MatSelectModule,
+    MatTooltipModule
   ],
   templateUrl: './ncs-net-assignments.html',
   styleUrl: './ncs-net-assignments.css',
@@ -64,9 +66,9 @@ export class NcsNetAssignments implements OnInit {
       callsign: ['', Validators.required],
       timeIn: [currentTime, Validators.required],
       name: ['', Validators.required],
-      duty: ['', Validators.required],
-      milageStart: ['', [Validators.required, Validators.min(0)]],
-      classification: ['', Validators.required]
+      duty: ['unassigned', Validators.required],
+      milageStart: [0, [Validators.required, Validators.min(0)]],
+      classification: ['observer', Validators.required]
     });
   }
 
@@ -131,6 +133,10 @@ export class NcsNetAssignments implements OnInit {
 
   cancelEdit(assignment: NetAssignment): void {
     assignment.isEditing = false;
+  }
+
+  checkout(assignment: NetAssignment): void {
+    assignment.timeOut = this.getCurrentTime();
   }
 
   deleteAssignment(assignment: NetAssignment): void {

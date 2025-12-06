@@ -47,3 +47,9 @@ The six fields of the add new assignment form should go left to right instead of
 
 ### Prompt 8
 The orientation of the form is still up to down instead of left to right. fix it.
+
+### Prompt 9
+Duty should default to unassigned. Milage start to 0. classification to observer.
+
+### Prompt 10
+add an action to the table rows called checkout. It will update the time out field.
