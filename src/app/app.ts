@@ -17,6 +17,8 @@ export class App {
   sidenavOpened = false;
 
   menuItems = [
+    // TODO(MGP): Why do I need this duplicate entry???
+    { path: '/ncs-net-assignments', label: 'NET Assignments', icon: 'assignment' },
     { path: '/ncs-net-assignments', label: 'NET Assignments', icon: 'assignment' },
     { path: '/ncs-people', label: 'People', icon: 'people' },
     { path: '/ncs-locations', label: 'Locations', icon: 'location_on' },
