@@ -12,10 +12,28 @@ h2 {
   padding: 1.5rem;
   border-radius: 8px;
   margin-bottom: 2rem;
+  overflow-x: auto;
 }
 
 .form-row {
+  display: flex;
   align-items: flex-start;
+  flex-wrap: nowrap;
+  min-width: fit-content;
+}
+
+.form-field-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.compact-field {
+  width: 120px;
+  display: inline-block;
+}
+
+.mat-mdc-form-field {
+  display: inline-block;
 }
 
 .full-width {
@@ -25,6 +43,7 @@ h2 {
 .add-button {
   margin-top: 0.5rem;
   height: 56px;
+  white-space: nowrap;
 }
 
 .autocomplete-results {

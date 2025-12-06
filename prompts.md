@@ -41,3 +41,9 @@ Change the add new assignment form:
 2. Make time in autopopulate to the current time.
 3. Duty should be a drop down from five canned duties: general, lead, scout, floater, and unassigned
 4. Classification should be a drop down from four canned values: full, partial, new, and observer
+
+### Prompt 7
+The six fields of the add new assignment form should go left to right instead of down. The length of each field should be much smaller so that it responsively only takes one row on the page.
+
+### Prompt 8
+The orientation of the form is still up to down instead of left to right. fix it.
