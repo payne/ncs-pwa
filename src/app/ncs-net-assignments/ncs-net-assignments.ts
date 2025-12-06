@@ -11,6 +11,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { OperatorService } from '../_services/operator.service';
+import { StorageService } from '../_services/storage.service';
 import { NetAssignment } from '../_models/ncs-net-assignments.model';
 import { Operator } from '../_models/operator.model';
 
@@ -47,17 +48,31 @@ export class NcsNetAssignments implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private operatorService: OperatorService
+    private operatorService: OperatorService,
+    private storageService: StorageService
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadOperators();
+    this.loadAssignmentsFromStorage();
     this.dataSource = new MatTableDataSource<NetAssignment>(this.assignments);
+  }
+
+  loadAssignmentsFromStorage(): void {
+    const savedAssignments = this.storageService.loadAssignments();
+    if (savedAssignments && savedAssignments.length > 0) {
+      this.assignments = savedAssignments;
+    }
   }
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
+    this.dataSource.data = this.assignments;
+  }
+
+  saveAssignmentsToStorage(): void {
+    this.storageService.saveAssignments(this.assignments);
   }
 
   initializeForm(): void {
@@ -119,7 +134,9 @@ export class NcsNetAssignments implements OnInit {
 
       this.assignments.unshift(newAssignment);
       this.dataSource.data = this.assignments;
+      this.saveAssignmentsToStorage();
       this.assignmentForm.reset();
+      this.initializeForm();
     }
   }
 
@@ -129,6 +146,7 @@ export class NcsNetAssignments implements OnInit {
 
   saveEdit(assignment: NetAssignment): void {
     assignment.isEditing = false;
+    this.saveAssignmentsToStorage();
   }
 
   cancelEdit(assignment: NetAssignment): void {
@@ -137,6 +155,7 @@ export class NcsNetAssignments implements OnInit {
 
   checkout(assignment: NetAssignment): void {
     assignment.timeOut = this.getCurrentTime();
+    this.saveAssignmentsToStorage();
   }
 
   deleteAssignment(assignment: NetAssignment): void {
@@ -144,6 +163,7 @@ export class NcsNetAssignments implements OnInit {
     if (index !== -1) {
       this.assignments.splice(index, 1);
       this.dataSource.data = this.assignments;
+      this.saveAssignmentsToStorage();
     }
   }
 

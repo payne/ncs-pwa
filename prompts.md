@@ -56,3 +56,6 @@ add an action to the table rows called checkout. It will update the time out fie
 
 ### Prompt 11
 Assignments does not show up when clicking the hamburger menu. Please fix.
+
+### Prompt 12
+Use localstorage so when the user navigates away from ncs-net-assignments and then returns to ncs-net-assignments data in the angular material table is not lost.
