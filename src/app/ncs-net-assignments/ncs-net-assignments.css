@@ -14,8 +14,17 @@ h2 {
   margin-bottom: 2rem;
 }
 
+.form-row {
+  align-items: flex-start;
+}
+
 .full-width {
   width: 100%;
+}
+
+.add-button {
+  margin-top: 0.5rem;
+  height: 56px;
 }
 
 .autocomplete-results {

@@ -38,6 +38,8 @@ export class NcsNetAssignments implements OnInit {
   operators: Operator[] = [];
   filteredOperators: Operator[] = [];
   assignments: NetAssignment[] = [];
+  duties: string[] = ['general', 'lead', 'scout', 'floater', 'unassigned'];
+  classifications: string[] = ['full', 'partial', 'new', 'observer'];
 
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -57,14 +59,22 @@ export class NcsNetAssignments implements OnInit {
   }
 
   initializeForm(): void {
+    const currentTime = this.getCurrentTime();
     this.assignmentForm = this.fb.group({
       callsign: ['', Validators.required],
-      timeIn: ['', Validators.required],
+      timeIn: [currentTime, Validators.required],
       name: ['', Validators.required],
       duty: ['', Validators.required],
       milageStart: ['', [Validators.required, Validators.min(0)]],
       classification: ['', Validators.required]
     });
+  }
+
+  getCurrentTime(): string {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
   }
 
   loadOperators(): void {

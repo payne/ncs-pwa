@@ -34,3 +34,10 @@ In chrome dev console there is an error. The application does not load into the 
 
 Uncaught Error: Could not resolve "@angular/animations/browser" imported by "@angular/platform-browser". Is it installed?
     at optional-peer-dep:__vite-optional-peer-dep:@angular/animations/browser:@angular/platform-browser:false (platform-browser:false:1:27)
+
+### Prompt 6
+Change the add new assignment form:
+1. Make the fields go from left to right mimicing a row in the angular material table.
+2. Make time in autopopulate to the current time.
+3. Duty should be a drop down from five canned duties: general, lead, scout, floater, and unassigned
+4. Classification should be a drop down from four canned values: full, partial, new, and observer
