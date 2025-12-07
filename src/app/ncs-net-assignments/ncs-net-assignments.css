@@ -1,5 +1,29 @@
 h1 {
+  margin-bottom: 1rem;
+}
+
+.net-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
   margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.net-selector mat-form-field {
+  min-width: 250px;
+}
+
+.create-net-button {
+  height: 56px;
+  white-space: nowrap;
+}
+
+.current-net-name {
+  font-weight: 500;
+  color: var(--color-primary, #1e3a62);
 }
 
 h2 {

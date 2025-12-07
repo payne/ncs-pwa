@@ -59,3 +59,25 @@ Assignments does not show up when clicking the hamburger menu. Please fix.
 
 ### Prompt 12
 Use localstorage so when the user navigates away from ncs-net-assignments and then returns to ncs-net-assignments data in the angular material table is not lost.
+
+### Prompt 13
+add firebase to the project. Many different web browsers may be working with the same NET. All NETs have a unique ID and a set of assignments for that NET. When one browser updates or adds an assignment the change is reflected in all the browsers.
+
+### Prompt 14
+Here's what happens when I do a `npm start`
+
+❯ npm start
+
+> ncs-pwa@0.0.0 start
+> ng serve
+
+Application bundle generation failed. [1.913 seconds] - 2025-12-07T01:31:03.064Z
+
+✘ [ERROR] TS2790: The operand of a 'delete' operator must be optional. [plugin angular-compiler]
+
+    src/app/_services/firebase.service.ts:58:11:
+      58 │     delete assignmentWithoutId.id;
+         ╵            ~~~~~~~~~~~~~~~~~~~~~~
+
+### Prompt 15
+Should the .firebase directory be in .gitignore?
