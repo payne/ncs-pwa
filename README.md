@@ -109,4 +109,5 @@ The application uses a custom color scheme defined in `src/styles.css`:
 
 ## License
 
-This project is proprietary and confidential.
+[Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+
