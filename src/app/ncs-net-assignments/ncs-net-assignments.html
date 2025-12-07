@@ -1,6 +1,22 @@
 <div class="container-fluid">
   <h1>NET Assignments</h1>
 
+  <!-- NET Selector -->
+  <div class="net-selector">
+    <mat-form-field appearance="outline">
+      <mat-label>Select NET</mat-label>
+      <mat-select [(value)]="currentNetId" (selectionChange)="selectNet($event.value)">
+        <mat-option *ngFor="let net of nets" [value]="net.id">
+          {{ net.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <button mat-raised-button color="accent" (click)="createNewNet()" class="create-net-button">
+      <mat-icon>add</mat-icon> Create New NET
+    </button>
+    <span class="current-net-name" *ngIf="currentNetName">Current NET: {{ currentNetName }}</span>
+  </div>
+
   <!-- Assignment Form -->
   <div class="form-container">
     <h2>Add New Assignment</h2>

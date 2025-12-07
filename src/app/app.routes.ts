@@ -4,12 +4,15 @@ import { NcsPeople } from './ncs-people/ncs-people';
 import { NcsLocations } from './ncs-locations/ncs-locations';
 import { NcsDuties } from './ncs-duties/ncs-duties';
 import { NcsAbout } from './ncs-about/ncs-about';
+import { NcsLogin } from './ncs-login/ncs-login';
+import { authGuard } from './_guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/ncs-net-assignments', pathMatch: 'full' },
-  { path: 'ncs-net-assignments', component: NcsNetAssignments },
-  { path: 'ncs-people', component: NcsPeople },
-  { path: 'ncs-locations', component: NcsLocations },
-  { path: 'ncs-duties', component: NcsDuties },
-  { path: 'ncs-about', component: NcsAbout }
+  { path: 'login', component: NcsLogin },
+  { path: 'ncs-net-assignments', component: NcsNetAssignments, canActivate: [authGuard] },
+  { path: 'ncs-people', component: NcsPeople, canActivate: [authGuard] },
+  { path: 'ncs-locations', component: NcsLocations, canActivate: [authGuard] },
+  { path: 'ncs-duties', component: NcsDuties, canActivate: [authGuard] },
+  { path: 'ncs-about', component: NcsAbout, canActivate: [authGuard] }
 ];

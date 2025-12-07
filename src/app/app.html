@@ -9,8 +9,9 @@
       <a mat-list-item
          *ngFor="let item of menuItems"
          [routerLink]="item.path"
-         (click)="sidenavOpened = false"
-         class="nav-item">
+         (click)="handleMenuClick(item)"
+         class="nav-item"
+         [class.action-item]="item.action">
         <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
         <span matListItemTitle>{{ item.label }}</span>
       </a>

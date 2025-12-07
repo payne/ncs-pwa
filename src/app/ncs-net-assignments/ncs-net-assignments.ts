@@ -10,8 +10,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { OperatorService } from '../_services/operator.service';
 import { StorageService } from '../_services/storage.service';
+import { FirebaseService } from '../_services/firebase.service';
 import { NetAssignment } from '../_models/ncs-net-assignments.model';
 import { Operator } from '../_models/operator.model';
 
@@ -29,7 +31,8 @@ import { Operator } from '../_models/operator.model';
     MatFormFieldModule,
     MatAutocompleteModule,
     MatSelectModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatDialogModule
   ],
   templateUrl: './ncs-net-assignments.html',
   styleUrl: './ncs-net-assignments.css',
@@ -43,36 +46,75 @@ export class NcsNetAssignments implements OnInit {
   assignments: NetAssignment[] = [];
   duties: string[] = ['general', 'lead', 'scout', 'floater', 'unassigned'];
   classifications: string[] = ['full', 'partial', 'new', 'observer'];
+  currentNetId: string = '';
+  currentNetName: string = '';
+  nets: any[] = [];
 
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
     private fb: FormBuilder,
     private operatorService: OperatorService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private firebaseService: FirebaseService
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadOperators();
-    this.loadAssignmentsFromStorage();
+    this.loadNets();
     this.dataSource = new MatTableDataSource<NetAssignment>(this.assignments);
+
+    const savedNetId = localStorage.getItem('currentNetId');
+    if (savedNetId) {
+      this.selectNet(savedNetId);
+    }
   }
 
-  loadAssignmentsFromStorage(): void {
-    const savedAssignments = this.storageService.loadAssignments();
-    if (savedAssignments && savedAssignments.length > 0) {
-      this.assignments = savedAssignments;
+  loadNets(): void {
+    this.firebaseService.getNets().subscribe({
+      next: (nets) => {
+        this.nets = nets;
+      },
+      error: (error) => {
+        console.error('Error loading NETs:', error);
+      }
+    });
+  }
+
+  selectNet(netId: string): void {
+    this.currentNetId = netId;
+    this.firebaseService.setCurrentNet(netId);
+    localStorage.setItem('currentNetId', netId);
+
+    const net = this.nets.find(n => n.id === netId);
+    if (net) {
+      this.currentNetName = net.name;
+    }
+
+    this.firebaseService.getAssignments(netId).subscribe({
+      next: (assignments) => {
+        this.assignments = assignments;
+        this.dataSource.data = this.assignments;
+      },
+      error: (error) => {
+        console.error('Error loading assignments:', error);
+      }
+    });
+  }
+
+  createNewNet(): void {
+    const netName = prompt('Enter NET name:');
+    if (netName) {
+      this.firebaseService.createNet(netName).then((netId) => {
+        this.selectNet(netId);
+      });
     }
   }
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
     this.dataSource.data = this.assignments;
-  }
-
-  saveAssignmentsToStorage(): void {
-    this.storageService.saveAssignments(this.assignments);
   }
 
   initializeForm(): void {
@@ -118,9 +160,9 @@ export class NcsNetAssignments implements OnInit {
   }
 
   addAssignment(): void {
-    if (this.assignmentForm.valid) {
+    if (this.assignmentForm.valid && this.currentNetId) {
       const newAssignment: NetAssignment = {
-        id: this.generateId(),
+        id: '',
         callsign: this.assignmentForm.value.callsign,
         timeIn: this.assignmentForm.value.timeIn,
         name: this.assignmentForm.value.name,
@@ -132,11 +174,12 @@ export class NcsNetAssignments implements OnInit {
         isEditing: false
       };
 
-      this.assignments.unshift(newAssignment);
-      this.dataSource.data = this.assignments;
-      this.saveAssignmentsToStorage();
-      this.assignmentForm.reset();
-      this.initializeForm();
+      this.firebaseService.addAssignment(this.currentNetId, newAssignment).then(() => {
+        this.assignmentForm.reset();
+        this.initializeForm();
+      }).catch(error => {
+        console.error('Error adding assignment:', error);
+      });
     }
   }
 
@@ -146,7 +189,11 @@ export class NcsNetAssignments implements OnInit {
 
   saveEdit(assignment: NetAssignment): void {
     assignment.isEditing = false;
-    this.saveAssignmentsToStorage();
+    if (this.currentNetId && assignment.id) {
+      this.firebaseService.updateAssignment(this.currentNetId, assignment.id, assignment).catch(error => {
+        console.error('Error updating assignment:', error);
+      });
+    }
   }
 
   cancelEdit(assignment: NetAssignment): void {
@@ -154,16 +201,19 @@ export class NcsNetAssignments implements OnInit {
   }
 
   checkout(assignment: NetAssignment): void {
-    assignment.timeOut = this.getCurrentTime();
-    this.saveAssignmentsToStorage();
+    const timeOut = this.getCurrentTime();
+    if (this.currentNetId && assignment.id) {
+      this.firebaseService.updateAssignment(this.currentNetId, assignment.id, { timeOut }).catch(error => {
+        console.error('Error checking out assignment:', error);
+      });
+    }
   }
 
   deleteAssignment(assignment: NetAssignment): void {
-    const index = this.assignments.findIndex(a => a.id === assignment.id);
-    if (index !== -1) {
-      this.assignments.splice(index, 1);
-      this.dataSource.data = this.assignments;
-      this.saveAssignmentsToStorage();
+    if (this.currentNetId && assignment.id) {
+      this.firebaseService.deleteAssignment(this.currentNetId, assignment.id).catch(error => {
+        console.error('Error deleting assignment:', error);
+      });
     }
   }
 
