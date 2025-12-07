@@ -112,3 +112,6 @@ It's working: thank you. Are any of the values in `src/environments` sensitive o
 
 ### Prompt 22
 Add a logout item to the hamburger menu just above about
+
+### Prompt 23
+At the bottom of the text in the ncs-about component should be a note that this code is under the Apache 2.0 License. And that the source code is available at https://github.com/payne/ncs-pwa

@@ -1,0 +1,34 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+h1 {
+  margin-bottom: 1.5rem;
+}
+
+.license-info {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.license-info h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.license-info p {
+  margin-bottom: 0.5rem;
+}
+
+.license-info a {
+  color: var(--color-primary, #1e3a62);
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.license-info a:hover {
+  text-decoration: underline;
+}
