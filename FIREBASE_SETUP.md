@@ -45,9 +45,19 @@ export const environment = {
 };
 ```
 
-## 5. Configure Database Rules (Important!)
+## 5. Enable Google Authentication
 
-For development, you can use these permissive rules. **IMPORTANT: Secure these before going to production!**
+1. In Firebase Console, click on "Authentication" in the left menu
+2. Click "Get started" if you haven't enabled Authentication yet
+3. Click on the "Sign-in method" tab
+4. Click on "Google" in the providers list
+5. Toggle "Enable"
+6. Select a support email (your email)
+7. Click "Save"
+
+## 6. Configure Database Rules (IMPORTANT!)
+
+Now that authentication is enabled, you need to secure your database to require authentication:
 
 1. In Firebase Console, go to "Realtime Database"
 2. Click on the "Rules" tab
@@ -56,37 +66,34 @@ For development, you can use these permissive rules. **IMPORTANT: Secure these b
 ```json
 {
   "rules": {
-    ".read": true,
-    ".write": true
+    ".read": "auth != null",
+    ".write": "auth != null"
   }
 }
 ```
 
-**For production**, use more secure rules like:
+This ensures that only authenticated users can read and write data.
 
-```json
-{
-  "rules": {
-    "nets": {
-      "$netId": {
-        ".read": true,
-        ".write": true
-      }
-    }
-  }
-}
-```
+**What this means:**
+- `auth != null` - Only authenticated users (signed in with Google) can access the database
+- Anyone with a Google/Gmail account can sign in and use the app
+- Data is protected from unauthenticated access
 
-## 6. Test Your Setup
+## 7. Test Your Setup
 
 1. Run your application: `npm start`
-2. Navigate to NET Assignments
-3. Click "Create New NET"
-4. Enter a NET name
-5. Add an assignment
-6. Open the same app in another browser or incognito window
-7. Select the same NET
-8. You should see the assignment appear in real-time!
+2. You should be redirected to the login page
+3. Click "Sign in with Google"
+4. Sign in with your Google account
+5. You'll be redirected to NET Assignments
+6. Click "Create New NET"
+7. Enter a NET name
+8. Add an assignment
+9. Open the same app in another browser or incognito window
+10. Sign in with the same or different Google account
+11. Select the same NET
+12. You should see the assignment appear in real-time!
+13. Click on your profile picture in the top right to sign out
 
 ## Database Structure
 

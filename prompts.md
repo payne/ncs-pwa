@@ -81,3 +81,28 @@ Application bundle generation failed. [1.913 seconds] - 2025-12-07T01:31:03.064Z
 
 ### Prompt 15
 Should the .firebase directory be in .gitignore?
+
+### Prompt 16
+Things work locally on http://localhost:4200 when I run `npm start` but do not work when deployed to firebase hosting. The URL is https://anet-b84b5.web.app/ My guess is authentication needs to be added. Set it up so anyone with a gmail address may use all aspects of the application.
+
+### Prompt 17
+when I run `npm run build` I get this error: bundle initial exceeded maximum budget. Budget 1.00 MB was not met by 176.42 kB with a total of 1.18 MB.
+
+### Prompt 18
+Add a script to package.json that does what `npm run build` does but puts the files in the public folder so that when I run `firebase deploy` the new version of the application is deployed.
+
+### Prompt 19
+Chrome dev console now has this error:
+```
+installHook.js:1 ERROR FirebaseError: Firebase: No Firebase App '[DEFAULT]' has been created - call initializeApp() first (app/no-app).
+```
+please fix it
+
+### Prompt 20
+Progress! But when I click the `Sign in with google` button a dialog very briefly appears and then there is this error in chrome dev tools console:
+
+```
+GET https://identitytoolkit.googleapis.com/v1/projects?key=AIzaSyDEHZPiUMPJd_1Mmp25rOgpm1VFBqNeT7I 400 (Bad Request)
+Error signing in with Google: FirebaseError: Firebase: Error (auth/configuration-not-found).
+```
+Please fix it

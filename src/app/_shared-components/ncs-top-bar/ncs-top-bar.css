@@ -47,6 +47,23 @@
   font-size: 14px;
 }
 
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.user-info {
+  padding: 8px 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.user-name {
+  margin: 0;
+  font-weight: 500;
+  color: #333;
+}
+
 @media (max-width: 576px) {
   .status-text {
     display: none;

@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import { initializeApp, FirebaseApp } from 'firebase/app';
 import { getDatabase, Database, ref, set, onValue, push, remove, update, off } from 'firebase/database';
-import { environment } from '../../environments/environment';
 import { NetAssignment } from '../_models/ncs-net-assignments.model';
 import { Observable } from 'rxjs';
 
@@ -9,13 +7,11 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class FirebaseService {
-  private app: FirebaseApp;
   private db: Database;
   private currentNetId: string = '';
 
   constructor() {
-    this.app = initializeApp(environment.firebase);
-    this.db = getDatabase(this.app);
+    this.db = getDatabase();
   }
 
   setCurrentNet(netId: string): void {

@@ -11,5 +11,20 @@
       <mat-icon>{{ isOnline ? 'wifi' : 'wifi_off' }}</mat-icon>
       <span class="status-text">{{ isOnline ? 'Online' : 'Offline' }}</span>
     </div>
+
+    <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-menu-button" *ngIf="userDisplayName">
+      <img [src]="userPhotoURL" *ngIf="userPhotoURL" class="user-avatar" [alt]="userDisplayName">
+      <mat-icon *ngIf="!userPhotoURL">account_circle</mat-icon>
+    </button>
+
+    <mat-menu #userMenu="matMenu">
+      <div class="user-info">
+        <p class="user-name">{{ userDisplayName }}</p>
+      </div>
+      <button mat-menu-item (click)="signOut()">
+        <mat-icon>logout</mat-icon>
+        <span>Sign Out</span>
+      </button>
+    </mat-menu>
   </div>
 </mat-toolbar>
