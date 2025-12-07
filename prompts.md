@@ -109,3 +109,6 @@ Please fix it
 
 ### Prompt 21
 It's working: thank you. Are any of the values in `src/environments` sensitive or is it ok to put it in a public github repo?
+
+### Prompt 22
+Add a logout item to the hamburger menu just above about
