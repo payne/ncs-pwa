@@ -2,6 +2,8 @@
 
 Visit https://anet-b84b5.web.app and login with your gmail address.  For now, you must have one to use things.  Later the login will be more flexible.
 
+[Here is a a demo of the application as of 12/6/2025](https://youtu.be/f__79srMfCM).
+
 Here's a screen grab of the app running in both firefox and chrome.
 
 ![img.png](img.png)
