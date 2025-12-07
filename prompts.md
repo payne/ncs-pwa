@@ -106,3 +106,6 @@ GET https://identitytoolkit.googleapis.com/v1/projects?key=AIzaSyDEHZPiUMPJd_1Mm
 Error signing in with Google: FirebaseError: Firebase: Error (auth/configuration-not-found).
 ```
 Please fix it
+
+### Prompt 21
+It's working: thank you. Are any of the values in `src/environments` sensitive or is it ok to put it in a public github repo?
