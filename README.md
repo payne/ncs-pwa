@@ -1,3 +1,11 @@
+# Quick Start -- this program is not done yet!
+
+Visit https://anet-b84b5.web.app and login with your gmail address.  For now, you must have one to use things.  Later the login will be more flexible.
+
+Here's a screen grab of the app running in both firefox and chrome.
+
+![img.png](img.png)
+
 # NCS Progressive Web Application (PWA)
 
 A responsive Progressive Web Application built with Angular and Material Design for managing NET assignments, people (operators), locations, and duties.
