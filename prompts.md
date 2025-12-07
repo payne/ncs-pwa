@@ -115,3 +115,9 @@ Add a logout item to the hamburger menu just above about
 
 ### Prompt 23
 At the bottom of the text in the ncs-about component should be a note that this code is under the Apache 2.0 License. And that the source code is available at https://github.com/payne/ncs-pwa
+
+### Prompt 24
+The clock in the top bar right side should update each second.
+
+### Prompt 25
+Change the code so the clock in the top bar right side updates each second.

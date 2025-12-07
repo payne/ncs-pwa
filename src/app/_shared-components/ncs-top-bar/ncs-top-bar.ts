@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -24,14 +24,22 @@ export class NcsTopBar implements OnInit, OnDestroy {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
   ) {}
 
   ngOnInit() {
     this.updateTime();
-    this.timeInterval = setInterval(() => {
-      this.updateTime();
-    }, 1000);
+
+    // Run the interval inside Angular's zone to ensure change detection
+    this.ngZone.runOutsideAngular(() => {
+      this.timeInterval = setInterval(() => {
+        this.ngZone.run(() => {
+          this.updateTime();
+        });
+      }, 1000);
+    });
 
     // Listen for online/offline events
     window.addEventListener('online', this.updateOnlineStatus.bind(this));
@@ -58,6 +66,7 @@ export class NcsTopBar implements OnInit, OnDestroy {
   updateTime() {
     const now = new Date();
     this.currentTime = now.toLocaleTimeString();
+    this.cdr.markForCheck();
   }
 
   updateOnlineStatus() {
