@@ -46,6 +46,7 @@ export class NcsNetAssignments implements OnInit {
   filteredOperators: Operator[] = [];
   selectedOperatorIndex: number = 0;
   autocompleteOffset: number = 0;
+  selectedCallsignAlreadyAdded: boolean = false;
   assignments: NetAssignment[] = [];
   duties: string[] = ['general', 'lead', 'scout', 'floater', 'unassigned'];
   classifications: string[] = ['full', 'partial', 'new', 'observer'];
@@ -175,9 +176,23 @@ export class NcsNetAssignments implements OnInit {
     this.filteredOperators = this.operatorService.searchOperators(searchValue, this.operators);
     this.selectedOperatorIndex = 0;
     this.autocompleteOffset = 0;
+    this.selectedCallsignAlreadyAdded = false;
+  }
+
+  isCallsignAlreadyAdded(callsign: string): boolean {
+    return this.assignments.some(assignment =>
+      assignment.callsign.toLowerCase() === callsign.toLowerCase() && !assignment.timeOut
+    );
   }
 
   selectOperator(operator: Operator): void {
+    const alreadyAdded = this.isCallsignAlreadyAdded(operator.callsign);
+
+    if (alreadyAdded) {
+      this.selectedCallsignAlreadyAdded = true;
+      return;
+    }
+
     this.assignmentForm.patchValue({
       callsign: operator.callsign,
       name: operator.name
@@ -185,6 +200,7 @@ export class NcsNetAssignments implements OnInit {
     this.filteredOperators = [];
     this.selectedOperatorIndex = 0;
     this.autocompleteOffset = 0;
+    this.selectedCallsignAlreadyAdded = false;
   }
 
   selectNextOperator(): void {
@@ -245,6 +261,13 @@ export class NcsNetAssignments implements OnInit {
 
   addAssignment(): void {
     if (this.assignmentForm.valid && this.currentNetId) {
+      const callsign = this.assignmentForm.value.callsign;
+
+      if (this.isCallsignAlreadyAdded(callsign)) {
+        console.warn('Callsign already added:', callsign);
+        return;
+      }
+
       const now = new Date();
       const timeInValue = this.assignmentForm.value.timeIn;
       const [hours, minutes] = timeInValue.split(':');
@@ -252,7 +275,7 @@ export class NcsNetAssignments implements OnInit {
 
       const newAssignment: NetAssignment = {
         id: '',
-        callsign: this.assignmentForm.value.callsign,
+        callsign: callsign,
         timeIn: now.toISOString(),
         name: this.assignmentForm.value.name,
         duty: this.assignmentForm.value.duty,

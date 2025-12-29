@@ -76,9 +76,13 @@
           class="autocomplete-item"
           *ngFor="let operator of filteredOperators.slice(autocompleteOffset, autocompleteOffset + 4); let i = index"
           [class.selected]="i === selectedOperatorIndex"
+          [class.already-added]="isCallsignAlreadyAdded(operator.callsign)"
           (click)="selectOperator(operator)">
           {{ operator.callsign }} - {{ operator.name }}
         </div>
+      </div>
+      <div class="already-added-message" *ngIf="selectedCallsignAlreadyAdded">
+        Already added
       </div>
     </div>
   </div>

@@ -94,8 +94,28 @@ h2 {
   font-weight: 500;
 }
 
+.autocomplete-item.already-added {
+  color: #999;
+  font-style: italic;
+}
+
+.autocomplete-item.already-added.selected {
+  background-color: #ccc;
+  color: #666;
+}
+
 .autocomplete-item:last-child {
   border-bottom: none;
+}
+
+.already-added-message {
+  padding: 0.75rem;
+  color: #dc3545;
+  font-weight: 500;
+  text-align: center;
+  background-color: #f8d7da;
+  border-radius: 4px;
+  margin-top: 0.5rem;
 }
 
 .filter-container {
