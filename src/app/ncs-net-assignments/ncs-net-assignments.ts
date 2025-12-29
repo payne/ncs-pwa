@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -59,7 +59,8 @@ export class NcsNetAssignments implements OnInit {
     private operatorService: OperatorService,
     private storageService: StorageService,
     private firebaseService: FirebaseService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -72,8 +73,27 @@ export class NcsNetAssignments implements OnInit {
     this.initializeForm();
     this.loadOperators();
     this.dataSource = new MatTableDataSource<NetAssignment>(this.assignments);
+    this.configureSorting();
 
     this.selectNet(savedNetId);
+  }
+
+  configureSorting(): void {
+    this.dataSource.sortingDataAccessor = (item: NetAssignment, property: string) => {
+      if (property === 'timeIn') {
+        return item.timeIn + '_' + (999999999999999 - (item.createdAt || 0));
+      }
+      switch (property) {
+        case 'callsign': return item.callsign;
+        case 'name': return item.name;
+        case 'duty': return item.duty;
+        case 'milageStart': return item.milageStart;
+        case 'classification': return item.classification;
+        case 'timeOut': return item.timeOut;
+        case 'milageEnd': return item.milageEnd;
+        default: return '';
+      }
+    };
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -104,12 +124,6 @@ export class NcsNetAssignments implements OnInit {
       next: (assignments) => {
         this.assignments = assignments;
         this.dataSource.data = this.assignments;
-
-        if (this.sort) {
-          this.sort.active = 'timeIn';
-          this.sort.direction = 'desc';
-          this.dataSource.sort = this.sort;
-        }
       },
       error: (error) => {
         console.error('Error loading assignments:', error);
@@ -126,6 +140,7 @@ export class NcsNetAssignments implements OnInit {
       this.sort.direction = 'desc';
       this.dataSource.sort = this.sort;
     }
+    this.cdr.detectChanges();
   }
 
   initializeForm(): void {
@@ -242,6 +257,7 @@ export class NcsNetAssignments implements OnInit {
         classification: this.assignmentForm.value.classification,
         timeOut: '',
         milageEnd: 0,
+        createdAt: Date.now(),
         isEditing: false
       };
 
