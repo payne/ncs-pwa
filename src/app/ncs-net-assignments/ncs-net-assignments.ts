@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -72,6 +72,16 @@ export class NcsNetAssignments implements OnInit {
     this.dataSource = new MatTableDataSource<NetAssignment>(this.assignments);
 
     this.selectNet(savedNetId);
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+      event.preventDefault();
+      if (this.assignmentForm.valid) {
+        this.addAssignment();
+      }
+    }
   }
 
   selectNet(netId: string): void {
