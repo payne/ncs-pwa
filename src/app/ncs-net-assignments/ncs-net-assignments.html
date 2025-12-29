@@ -13,7 +13,7 @@
           <div class="col-auto">
             <mat-form-field appearance="outline" class="compact-field">
               <mat-label>Callsign</mat-label>
-              <input matInput formControlName="callsign" (input)="onSearchOperator($any($event.target).value)">
+              <input matInput formControlName="callsign" (input)="onSearchOperator($any($event.target).value)" (keydown)="onCallsignKeydown($event)">
             </mat-form-field>
           </div>
 
@@ -74,7 +74,8 @@
       <div class="autocomplete-results">
         <div
           class="autocomplete-item"
-          *ngFor="let operator of filteredOperators.slice(0, 4)"
+          *ngFor="let operator of filteredOperators.slice(0, 4); let i = index"
+          [class.selected]="i === selectedOperatorIndex"
           (click)="selectOperator(operator)">
           {{ operator.callsign }} - {{ operator.name }}
         </div>

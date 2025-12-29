@@ -88,6 +88,12 @@ h2 {
   background-color: #f0f0f0;
 }
 
+.autocomplete-item.selected {
+  background-color: var(--color-primary, #1e3a62);
+  color: white;
+  font-weight: 500;
+}
+
 .autocomplete-item:last-child {
   border-bottom: none;
 }
