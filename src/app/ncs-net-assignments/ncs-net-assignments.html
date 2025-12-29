@@ -70,11 +70,11 @@
     </div>
 
     <div class="autocomplete-container" *ngIf="filteredOperators.length > 0">
-      <h2>Matching Callsigns</h2>
+      <h2>{{ filteredOperators.length }} Matching Callsign{{ filteredOperators.length === 1 ? '' : 's' }}</h2>
       <div class="autocomplete-results">
         <div
           class="autocomplete-item"
-          *ngFor="let operator of filteredOperators"
+          *ngFor="let operator of filteredOperators.slice(0, 4)"
           (click)="selectOperator(operator)">
           {{ operator.callsign }} - {{ operator.name }}
         </div>
