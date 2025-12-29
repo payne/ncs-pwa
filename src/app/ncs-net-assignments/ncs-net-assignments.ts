@@ -104,6 +104,12 @@ export class NcsNetAssignments implements OnInit {
       next: (assignments) => {
         this.assignments = assignments;
         this.dataSource.data = this.assignments;
+
+        if (this.sort) {
+          this.sort.active = 'timeIn';
+          this.sort.direction = 'desc';
+          this.dataSource.sort = this.sort;
+        }
       },
       error: (error) => {
         console.error('Error loading assignments:', error);
@@ -114,6 +120,12 @@ export class NcsNetAssignments implements OnInit {
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
     this.dataSource.data = this.assignments;
+
+    if (this.sort) {
+      this.sort.active = 'timeIn';
+      this.sort.direction = 'desc';
+      this.dataSource.sort = this.sort;
+    }
   }
 
   initializeForm(): void {
