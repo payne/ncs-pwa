@@ -206,6 +206,9 @@ export class NcsNetAssignments implements OnInit {
     if (event.key === 'Tab') {
       event.preventDefault();
       this.selectCurrentOperator();
+    } else if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+      event.preventDefault();
+      this.selectCurrentOperator();
     } else if (event.ctrlKey && event.key === 'n') {
       event.preventDefault();
       this.selectNextOperator();
