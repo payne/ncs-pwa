@@ -74,7 +74,7 @@
       <div class="autocomplete-results">
         <div
           class="autocomplete-item"
-          *ngFor="let operator of filteredOperators.slice(0, 4); let i = index"
+          *ngFor="let operator of filteredOperators.slice(autocompleteOffset, autocompleteOffset + 4); let i = index"
           [class.selected]="i === selectedOperatorIndex"
           (click)="selectOperator(operator)">
           {{ operator.callsign }} - {{ operator.name }}

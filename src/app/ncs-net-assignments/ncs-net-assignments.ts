@@ -45,6 +45,7 @@ export class NcsNetAssignments implements OnInit {
   operators: Operator[] = [];
   filteredOperators: Operator[] = [];
   selectedOperatorIndex: number = 0;
+  autocompleteOffset: number = 0;
   assignments: NetAssignment[] = [];
   duties: string[] = ['general', 'lead', 'scout', 'floater', 'unassigned'];
   classifications: string[] = ['full', 'partial', 'new', 'observer'];
@@ -148,6 +149,7 @@ export class NcsNetAssignments implements OnInit {
   onSearchOperator(searchValue: string): void {
     this.filteredOperators = this.operatorService.searchOperators(searchValue, this.operators);
     this.selectedOperatorIndex = 0;
+    this.autocompleteOffset = 0;
   }
 
   selectOperator(operator: Operator): void {
@@ -157,24 +159,44 @@ export class NcsNetAssignments implements OnInit {
     });
     this.filteredOperators = [];
     this.selectedOperatorIndex = 0;
+    this.autocompleteOffset = 0;
   }
 
   selectNextOperator(): void {
-    if (this.filteredOperators.length > 0) {
-      this.selectedOperatorIndex = (this.selectedOperatorIndex + 1) % Math.min(4, this.filteredOperators.length);
+    if (this.filteredOperators.length === 0) return;
+
+    const currentPage = this.filteredOperators.slice(this.autocompleteOffset, this.autocompleteOffset + 4);
+
+    if (this.selectedOperatorIndex < currentPage.length - 1) {
+      this.selectedOperatorIndex++;
+    } else if (this.autocompleteOffset + 4 < this.filteredOperators.length) {
+      this.autocompleteOffset += 4;
+      this.selectedOperatorIndex = 0;
+    } else {
+      this.autocompleteOffset = 0;
+      this.selectedOperatorIndex = 0;
     }
   }
 
   selectPreviousOperator(): void {
-    if (this.filteredOperators.length > 0) {
-      const maxIndex = Math.min(4, this.filteredOperators.length) - 1;
-      this.selectedOperatorIndex = this.selectedOperatorIndex > 0 ? this.selectedOperatorIndex - 1 : maxIndex;
+    if (this.filteredOperators.length === 0) return;
+
+    if (this.selectedOperatorIndex > 0) {
+      this.selectedOperatorIndex--;
+    } else if (this.autocompleteOffset > 0) {
+      this.autocompleteOffset -= 4;
+      this.selectedOperatorIndex = 3;
+    } else {
+      const lastPageOffset = Math.floor((this.filteredOperators.length - 1) / 4) * 4;
+      this.autocompleteOffset = lastPageOffset;
+      this.selectedOperatorIndex = Math.min(3, this.filteredOperators.length - lastPageOffset - 1);
     }
   }
 
   selectCurrentOperator(): void {
-    if (this.filteredOperators.length > 0 && this.selectedOperatorIndex < this.filteredOperators.length) {
-      this.selectOperator(this.filteredOperators[this.selectedOperatorIndex]);
+    const actualIndex = this.autocompleteOffset + this.selectedOperatorIndex;
+    if (this.filteredOperators.length > 0 && actualIndex < this.filteredOperators.length) {
+      this.selectOperator(this.filteredOperators[actualIndex]);
     }
   }
 
