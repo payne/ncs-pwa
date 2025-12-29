@@ -80,10 +80,8 @@ export class NcsNetAssignments implements OnInit {
 
   configureSorting(): void {
     this.dataSource.sortingDataAccessor = (item: NetAssignment, property: string) => {
-      if (property === 'timeIn') {
-        return item.timeIn + '_' + (999999999999999 - (item.createdAt || 0));
-      }
       switch (property) {
+        case 'timeIn': return item.timeIn;
         case 'callsign': return item.callsign;
         case 'name': return item.name;
         case 'duty': return item.duty;
@@ -247,17 +245,21 @@ export class NcsNetAssignments implements OnInit {
 
   addAssignment(): void {
     if (this.assignmentForm.valid && this.currentNetId) {
+      const now = new Date();
+      const timeInValue = this.assignmentForm.value.timeIn;
+      const [hours, minutes] = timeInValue.split(':');
+      now.setHours(parseInt(hours), parseInt(minutes), now.getSeconds(), now.getMilliseconds());
+
       const newAssignment: NetAssignment = {
         id: '',
         callsign: this.assignmentForm.value.callsign,
-        timeIn: this.assignmentForm.value.timeIn,
+        timeIn: now.toISOString(),
         name: this.assignmentForm.value.name,
         duty: this.assignmentForm.value.duty,
         milageStart: this.assignmentForm.value.milageStart,
         classification: this.assignmentForm.value.classification,
         timeOut: '',
         milageEnd: 0,
-        createdAt: Date.now(),
         isEditing: false
       };
 
@@ -267,6 +269,18 @@ export class NcsNetAssignments implements OnInit {
       }).catch(error => {
         console.error('Error adding assignment:', error);
       });
+    }
+  }
+
+  formatTimeIn(timeIn: string): string {
+    if (!timeIn) return '';
+    try {
+      const date = new Date(timeIn);
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    } catch {
+      return timeIn;
     }
   }
 

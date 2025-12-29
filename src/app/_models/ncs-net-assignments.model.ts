@@ -8,6 +8,5 @@ export interface NetAssignment {
   classification: string;
   timeOut: string;
   milageEnd: number;
-  createdAt?: number;
   isEditing?: boolean;
 }
