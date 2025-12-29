@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatSortModule, MatSort } from '@angular/material/sort';
@@ -48,7 +49,6 @@ export class NcsNetAssignments implements OnInit {
   classifications: string[] = ['full', 'partial', 'new', 'observer'];
   currentNetId: string = '';
   currentNetName: string = '';
-  nets: any[] = [];
 
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -56,30 +56,22 @@ export class NcsNetAssignments implements OnInit {
     private fb: FormBuilder,
     private operatorService: OperatorService,
     private storageService: StorageService,
-    private firebaseService: FirebaseService
+    private firebaseService: FirebaseService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
+    const savedNetId = localStorage.getItem('currentNetId');
+    if (!savedNetId) {
+      this.router.navigate(['/ncs-select-net']);
+      return;
+    }
+
     this.initializeForm();
     this.loadOperators();
-    this.loadNets();
     this.dataSource = new MatTableDataSource<NetAssignment>(this.assignments);
 
-    const savedNetId = localStorage.getItem('currentNetId');
-    if (savedNetId) {
-      this.selectNet(savedNetId);
-    }
-  }
-
-  loadNets(): void {
-    this.firebaseService.getNets().subscribe({
-      next: (nets) => {
-        this.nets = nets;
-      },
-      error: (error) => {
-        console.error('Error loading NETs:', error);
-      }
-    });
+    this.selectNet(savedNetId);
   }
 
   selectNet(netId: string): void {
@@ -87,10 +79,14 @@ export class NcsNetAssignments implements OnInit {
     this.firebaseService.setCurrentNet(netId);
     localStorage.setItem('currentNetId', netId);
 
-    const net = this.nets.find(n => n.id === netId);
-    if (net) {
-      this.currentNetName = net.name;
-    }
+    this.firebaseService.getNets().subscribe({
+      next: (nets) => {
+        const net = nets.find(n => n.id === netId);
+        if (net) {
+          this.currentNetName = net.name;
+        }
+      }
+    });
 
     this.firebaseService.getAssignments(netId).subscribe({
       next: (assignments) => {
@@ -101,15 +97,6 @@ export class NcsNetAssignments implements OnInit {
         console.error('Error loading assignments:', error);
       }
     });
-  }
-
-  createNewNet(): void {
-    const netName = prompt('Enter NET name:');
-    if (netName) {
-      this.firebaseService.createNet(netName).then((netId) => {
-        this.selectNet(netId);
-      });
-    }
   }
 
   ngAfterViewInit(): void {

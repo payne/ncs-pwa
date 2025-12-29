@@ -18,6 +18,8 @@ export class App {
   sidenavOpened = false;
 
   menuItems = [
+    { path: '/ncs-select-net', label: 'Select NET', icon: 'dns', action: null },
+    { path: '/ncs-select-net', label: 'Select NET', icon: 'dns', action: null },
     { path: '/ncs-net-assignments', label: 'NET Assignments', icon: 'assignment', action: null },
     { path: '/ncs-people', label: 'People', icon: 'people', action: null },
     { path: '/ncs-locations', label: 'Locations', icon: 'location_on', action: null },

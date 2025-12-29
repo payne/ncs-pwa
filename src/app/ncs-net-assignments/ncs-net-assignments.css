@@ -1,24 +1,12 @@
 h1 {
-  margin-bottom: 1rem;
-}
-
-.net-selector {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
   margin-bottom: 2rem;
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-radius: 8px;
 }
 
-.net-selector mat-form-field {
-  min-width: 250px;
-}
-
-.create-net-button {
-  height: 56px;
-  white-space: nowrap;
+.current-net-label {
+  font-size: 1rem;
+  color: #6c757d;
+  margin-right: 0.5rem;
+  font-weight: 400;
 }
 
 .current-net-name {
@@ -31,12 +19,20 @@ h2 {
   margin-bottom: 1rem;
 }
 
+.form-and-autocomplete-wrapper {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  align-items: flex-start;
+}
+
 .form-container {
   background-color: #f8f9fa;
   padding: 1.5rem;
   border-radius: 8px;
-  margin-bottom: 2rem;
   overflow-x: auto;
+  flex: 1;
+  min-width: 0;
 }
 
 .form-row {
@@ -44,11 +40,6 @@ h2 {
   align-items: flex-start;
   flex-wrap: nowrap;
   min-width: fit-content;
-}
-
-.form-field-wrapper {
-  position: relative;
-  display: inline-block;
 }
 
 .compact-field {
@@ -70,15 +61,20 @@ h2 {
   white-space: nowrap;
 }
 
+.autocomplete-container {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  flex-shrink: 0;
+  width: 400px;
+}
+
 .autocomplete-results {
-  position: absolute;
-  z-index: 1000;
   background-color: white;
   border: 1px solid #ddd;
   border-radius: 4px;
-  max-height: 200px;
+  max-height: 720px;
   overflow-y: auto;
-  width: 100%;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 

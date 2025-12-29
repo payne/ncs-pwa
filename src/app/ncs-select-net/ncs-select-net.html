@@ -1,0 +1,24 @@
+<div class="container-fluid">
+  <h1>Select NET</h1>
+
+  <div class="net-selector-container">
+    <div class="net-selector">
+      <mat-form-field appearance="outline">
+        <mat-label>Select NET</mat-label>
+        <mat-select [(value)]="currentNetId" (selectionChange)="selectNet($event.value)">
+          <mat-option *ngFor="let net of nets" [value]="net.id">
+            {{ net.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <button mat-raised-button color="accent" (click)="createNewNet()" class="create-net-button">
+        <mat-icon>add</mat-icon> Create New NET
+      </button>
+    </div>
+
+    <div class="current-net-info" *ngIf="currentNetName">
+      <p class="current-net-label">Current NET:</p>
+      <p class="current-net-name">{{ currentNetName }}</p>
+    </div>
+  </div>
+</div>

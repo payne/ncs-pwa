@@ -21,9 +21,11 @@ export class OperatorService {
     }
 
     const term = searchTerm.toLowerCase().trim();
-    return operators.filter(operator =>
-      operator.name.toLowerCase().includes(term) ||
-      operator.callsign.toLowerCase().includes(term)
-    );
+    return operators
+      .filter(operator =>
+        operator.name.toLowerCase().includes(term) ||
+        operator.callsign.toLowerCase().includes(term)
+      )
+      .sort((a, b) => a.callsign.localeCompare(b.callsign));
   }
 }

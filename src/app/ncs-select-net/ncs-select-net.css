@@ -1,0 +1,57 @@
+h1 {
+  margin-bottom: 2rem;
+}
+
+.net-selector-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.net-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.net-selector mat-form-field {
+  min-width: 250px;
+  flex: 1;
+}
+
+.create-net-button {
+  height: 56px;
+  white-space: nowrap;
+}
+
+.current-net-info {
+  text-align: center;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid var(--color-primary, #1e3a62);
+}
+
+.current-net-label {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+}
+
+.current-net-name {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--color-primary, #1e3a62);
+  margin: 0;
+}
+
+@media (min-width: 576px) {
+  .net-selector {
+    flex-wrap: nowrap;
+  }
+}

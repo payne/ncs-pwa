@@ -1,92 +1,85 @@
 <div class="container-fluid">
-  <h1>NET Assignments</h1>
+  <h1 *ngIf="currentNetName">
+    <span class="current-net-label">Current NET:</span>
+    <span class="current-net-name">{{ currentNetName }}</span>
+  </h1>
 
-  <!-- NET Selector -->
-  <div class="net-selector">
-    <mat-form-field appearance="outline">
-      <mat-label>Select NET</mat-label>
-      <mat-select [(value)]="currentNetId" (selectionChange)="selectNet($event.value)">
-        <mat-option *ngFor="let net of nets" [value]="net.id">
-          {{ net.name }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-    <button mat-raised-button color="accent" (click)="createNewNet()" class="create-net-button">
-      <mat-icon>add</mat-icon> Create New NET
-    </button>
-    <span class="current-net-name" *ngIf="currentNetName">Current NET: {{ currentNetName }}</span>
-  </div>
+  <!-- Assignment Form and Autocomplete Section -->
+  <div class="form-and-autocomplete-wrapper">
+    <div class="form-container">
+      <h2>Add New Assignment</h2>
+      <form [formGroup]="assignmentForm" (ngSubmit)="addAssignment()">
+        <div class="row form-row g-2">
+          <div class="col-auto">
+            <mat-form-field appearance="outline" class="compact-field">
+              <mat-label>Callsign</mat-label>
+              <input matInput formControlName="callsign" (input)="onSearchOperator($any($event.target).value)">
+            </mat-form-field>
+          </div>
 
-  <!-- Assignment Form -->
-  <div class="form-container">
-    <h2>Add New Assignment</h2>
-    <form [formGroup]="assignmentForm" (ngSubmit)="addAssignment()">
-      <div class="row form-row g-2">
-        <div class="col-auto form-field-wrapper">
-          <mat-form-field appearance="outline" class="compact-field">
-            <mat-label>Callsign</mat-label>
-            <input matInput formControlName="callsign" (input)="onSearchOperator($any($event.target).value)">
-          </mat-form-field>
-          <div class="autocomplete-results" *ngIf="filteredOperators.length > 0">
-            <div
-              class="autocomplete-item"
-              *ngFor="let operator of filteredOperators"
-              (click)="selectOperator(operator)">
-              {{ operator.callsign }} - {{ operator.name }}
-            </div>
+          <div class="col-auto">
+            <mat-form-field appearance="outline" class="compact-field">
+              <mat-label>Time In</mat-label>
+              <input matInput type="time" formControlName="timeIn">
+            </mat-form-field>
+          </div>
+
+          <div class="col-auto">
+            <mat-form-field appearance="outline" class="compact-field">
+              <mat-label>Name</mat-label>
+              <input matInput formControlName="name" (input)="onSearchOperator($any($event.target).value)">
+            </mat-form-field>
+          </div>
+
+          <div class="col-auto">
+            <mat-form-field appearance="outline" class="compact-field">
+              <mat-label>Duty</mat-label>
+              <mat-select formControlName="duty">
+                <mat-option *ngFor="let duty of duties" [value]="duty">
+                  {{ duty }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="col-auto">
+            <mat-form-field appearance="outline" class="compact-field">
+              <mat-label>Milage Start</mat-label>
+              <input matInput type="number" formControlName="milageStart">
+            </mat-form-field>
+          </div>
+
+          <div class="col-auto">
+            <mat-form-field appearance="outline" class="compact-field">
+              <mat-label>Classification</mat-label>
+              <mat-select formControlName="classification">
+                <mat-option *ngFor="let classification of classifications" [value]="classification">
+                  {{ classification }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="col-auto">
+            <button mat-raised-button color="primary" type="submit" [disabled]="!assignmentForm.valid" class="add-button">
+              Add
+            </button>
           </div>
         </div>
+      </form>
+    </div>
 
-        <div class="col-auto">
-          <mat-form-field appearance="outline" class="compact-field">
-            <mat-label>Time In</mat-label>
-            <input matInput type="time" formControlName="timeIn">
-          </mat-form-field>
-        </div>
-
-        <div class="col-auto form-field-wrapper">
-          <mat-form-field appearance="outline" class="compact-field">
-            <mat-label>Name</mat-label>
-            <input matInput formControlName="name" (input)="onSearchOperator($any($event.target).value)">
-          </mat-form-field>
-        </div>
-
-        <div class="col-auto">
-          <mat-form-field appearance="outline" class="compact-field">
-            <mat-label>Duty</mat-label>
-            <mat-select formControlName="duty">
-              <mat-option *ngFor="let duty of duties" [value]="duty">
-                {{ duty }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-
-        <div class="col-auto">
-          <mat-form-field appearance="outline" class="compact-field">
-            <mat-label>Milage Start</mat-label>
-            <input matInput type="number" formControlName="milageStart">
-          </mat-form-field>
-        </div>
-
-        <div class="col-auto">
-          <mat-form-field appearance="outline" class="compact-field">
-            <mat-label>Classification</mat-label>
-            <mat-select formControlName="classification">
-              <mat-option *ngFor="let classification of classifications" [value]="classification">
-                {{ classification }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-
-        <div class="col-auto">
-          <button mat-raised-button color="primary" type="submit" [disabled]="!assignmentForm.valid" class="add-button">
-            Add
-          </button>
+    <div class="autocomplete-container" *ngIf="filteredOperators.length > 0">
+      <h2>Matching Callsigns</h2>
+      <div class="autocomplete-results">
+        <div
+          class="autocomplete-item"
+          *ngFor="let operator of filteredOperators"
+          (click)="selectOperator(operator)">
+          {{ operator.callsign }} - {{ operator.name }}
         </div>
       </div>
-    </form>
+    </div>
   </div>
 
   <!-- Filter -->
