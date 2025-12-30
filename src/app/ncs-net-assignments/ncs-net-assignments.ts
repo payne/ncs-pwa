@@ -50,6 +50,7 @@ export class NcsNetAssignments implements OnInit {
   assignments: NetAssignment[] = [];
   duties: string[] = ['general', 'lead', 'scout', 'floater', 'unassigned'];
   classifications: string[] = ['full', 'partial', 'new', 'observer'];
+  lastDuty: string = 'unassigned';
   currentNetId: string = '';
   currentNetName: string = '';
 
@@ -148,7 +149,7 @@ export class NcsNetAssignments implements OnInit {
       callsign: ['', Validators.required],
       timeIn: [currentTime, Validators.required],
       name: ['', Validators.required],
-      duty: ['unassigned', Validators.required],
+      duty: [this.lastDuty, Validators.required],
       milageStart: [0, [Validators.required, Validators.min(0)]],
       classification: ['observer', Validators.required]
     });
@@ -272,6 +273,8 @@ export class NcsNetAssignments implements OnInit {
       const timeInValue = this.assignmentForm.value.timeIn;
       const [hours, minutes] = timeInValue.split(':');
       now.setHours(parseInt(hours), parseInt(minutes), now.getSeconds(), now.getMilliseconds());
+
+      this.lastDuty = this.assignmentForm.value.duty;
 
       const newAssignment: NetAssignment = {
         id: '',
