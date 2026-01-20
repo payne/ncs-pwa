@@ -84,7 +84,6 @@ export class NcsNetAssignments implements OnInit {
 
   configureSorting(): void {
     this.dataSource.sortingDataAccessor = (item: any, property: string) => {
-      if (item.isAddRow) return '';
       switch (property) {
         case 'timeIn': return item.timeIn;
         case 'callsign': return item.callsign;
@@ -96,6 +95,15 @@ export class NcsNetAssignments implements OnInit {
         case 'milageEnd': return item.milageEnd;
         default: return '';
       }
+    };
+
+    // Override sortData to keep add row always at top
+    const defaultSort = this.dataSource.sortData;
+    this.dataSource.sortData = (data: any[], sort: MatSort) => {
+      const addRow = data.find(item => item.isAddRow);
+      const otherRows = data.filter(item => !item.isAddRow);
+      const sortedRows = defaultSort.call(this.dataSource, otherRows, sort);
+      return addRow ? [addRow, ...sortedRows] : sortedRows;
     };
   }
 
