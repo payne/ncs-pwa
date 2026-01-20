@@ -40,7 +40,7 @@ import { Operator } from '../_models/operator.model';
 })
 export class NcsNetAssignments implements OnInit {
   assignmentForm!: FormGroup;
-  dataSource!: MatTableDataSource<NetAssignment>;
+  dataSource!: MatTableDataSource<any>;
   displayedColumns: string[] = ['callsign', 'timeIn', 'name', 'duty', 'milageStart', 'classification', 'timeOut', 'milageEnd', 'actions'];
   operators: Operator[] = [];
   filteredOperators: Operator[] = [];
@@ -53,6 +53,7 @@ export class NcsNetAssignments implements OnInit {
   lastDuty: string = 'unassigned';
   currentNetId: string = '';
   currentNetName: string = '';
+  addRowPlaceholder: any = { isAddRow: true };
 
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -74,14 +75,16 @@ export class NcsNetAssignments implements OnInit {
 
     this.initializeForm();
     this.loadOperators();
-    this.dataSource = new MatTableDataSource<NetAssignment>(this.assignments);
+    this.dataSource = new MatTableDataSource<any>([this.addRowPlaceholder]);
     this.configureSorting();
+    this.configureFilter();
 
     this.selectNet(savedNetId);
   }
 
   configureSorting(): void {
-    this.dataSource.sortingDataAccessor = (item: NetAssignment, property: string) => {
+    this.dataSource.sortingDataAccessor = (item: any, property: string) => {
+      if (item.isAddRow) return '';
       switch (property) {
         case 'timeIn': return item.timeIn;
         case 'callsign': return item.callsign;
@@ -93,6 +96,19 @@ export class NcsNetAssignments implements OnInit {
         case 'milageEnd': return item.milageEnd;
         default: return '';
       }
+    };
+  }
+
+  configureFilter(): void {
+    this.dataSource.filterPredicate = (data: any, filter: string) => {
+      if (data.isAddRow) return true;
+      const dataStr = [
+        data.callsign,
+        data.name,
+        data.duty,
+        data.classification
+      ].join(' ').toLowerCase();
+      return dataStr.includes(filter);
     };
   }
 
@@ -123,7 +139,7 @@ export class NcsNetAssignments implements OnInit {
     this.firebaseService.getAssignments(netId).subscribe({
       next: (assignments) => {
         this.assignments = assignments;
-        this.dataSource.data = this.assignments;
+        this.dataSource.data = [this.addRowPlaceholder, ...this.assignments];
       },
       error: (error) => {
         console.error('Error loading assignments:', error);
@@ -133,7 +149,7 @@ export class NcsNetAssignments implements OnInit {
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
-    this.dataSource.data = this.assignments;
+    this.dataSource.data = [this.addRowPlaceholder, ...this.assignments];
 
     if (this.sort) {
       this.sort.active = 'timeIn';
