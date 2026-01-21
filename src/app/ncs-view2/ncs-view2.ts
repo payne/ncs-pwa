@@ -12,7 +12,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FirebaseService } from '../_services/firebase.service';
+import { OperatorService } from '../_services/operator.service';
 import { View2Entry } from '../_models/ncs-view2.model';
+import { Operator } from '../_models/operator.model';
 
 @Component({
   selector: 'app-ncs-view2',
@@ -53,6 +55,11 @@ export class NcsView2 implements OnInit {
     { key: 'actions', label: 'Actions', visible: true }
   ];
   entries: View2Entry[] = [];
+  operators: Operator[] = [];
+  filteredOperators: Operator[] = [];
+  selectedOperatorIndex: number = 0;
+  autocompleteOffset: number = 0;
+  selectedCallsignAlreadyAdded: boolean = false;
   currentNetId: string = '';
   currentNetName: string = '';
   addRowPlaceholder: any = { isAddRow: true };
@@ -62,6 +69,7 @@ export class NcsView2 implements OnInit {
   constructor(
     private fb: FormBuilder,
     private firebaseService: FirebaseService,
+    private operatorService: OperatorService,
     private router: Router,
     private cdr: ChangeDetectorRef,
     private elementRef: ElementRef
@@ -75,11 +83,119 @@ export class NcsView2 implements OnInit {
     }
 
     this.initializeForm();
+    this.loadOperators();
     this.dataSource = new MatTableDataSource<any>([this.addRowPlaceholder]);
     this.configureSorting();
     this.configureFilter();
 
     this.selectNet(savedNetId);
+  }
+
+  loadOperators(): void {
+    this.operatorService.getOperators().subscribe({
+      next: (operators) => {
+        this.operators = operators;
+      },
+      error: (error) => {
+        console.error('Error loading operators:', error);
+      }
+    });
+  }
+
+  onSearchOperator(searchValue: string): void {
+    this.filteredOperators = this.operatorService.searchOperators(searchValue, this.operators);
+    this.selectedOperatorIndex = 0;
+    this.autocompleteOffset = 0;
+    this.selectedCallsignAlreadyAdded = false;
+  }
+
+  isCallsignAlreadyAdded(callsign: string): boolean {
+    return this.entries.some(entry =>
+      entry.callsign.toLowerCase() === callsign.toLowerCase()
+    );
+  }
+
+  selectOperator(operator: Operator): void {
+    const alreadyAdded = this.isCallsignAlreadyAdded(operator.callsign);
+
+    if (alreadyAdded) {
+      this.selectedCallsignAlreadyAdded = true;
+      return;
+    }
+
+    this.entryForm.patchValue({
+      callsign: operator.callsign,
+      firstName: operator.name.split(' ')[0] || '',
+      lastName: operator.name.split(' ').slice(1).join(' ') || ''
+    });
+    this.filteredOperators = [];
+    this.selectedOperatorIndex = 0;
+    this.autocompleteOffset = 0;
+    this.selectedCallsignAlreadyAdded = false;
+
+    // Focus the add button so user can press Enter to add
+    setTimeout(() => {
+      const addButton = this.elementRef.nativeElement.querySelector('.add-row button');
+      if (addButton) {
+        addButton.focus();
+      }
+    });
+  }
+
+  selectNextOperator(): void {
+    if (this.filteredOperators.length === 0) return;
+
+    const currentPage = this.filteredOperators.slice(this.autocompleteOffset, this.autocompleteOffset + 4);
+
+    if (this.selectedOperatorIndex < currentPage.length - 1) {
+      this.selectedOperatorIndex++;
+    } else if (this.autocompleteOffset + 4 < this.filteredOperators.length) {
+      this.autocompleteOffset += 4;
+      this.selectedOperatorIndex = 0;
+    } else {
+      this.autocompleteOffset = 0;
+      this.selectedOperatorIndex = 0;
+    }
+  }
+
+  selectPreviousOperator(): void {
+    if (this.filteredOperators.length === 0) return;
+
+    if (this.selectedOperatorIndex > 0) {
+      this.selectedOperatorIndex--;
+    } else if (this.autocompleteOffset > 0) {
+      this.autocompleteOffset -= 4;
+      this.selectedOperatorIndex = 3;
+    } else {
+      const lastPageOffset = Math.floor((this.filteredOperators.length - 1) / 4) * 4;
+      this.autocompleteOffset = lastPageOffset;
+      this.selectedOperatorIndex = Math.min(3, this.filteredOperators.length - lastPageOffset - 1);
+    }
+  }
+
+  selectCurrentOperator(): void {
+    const actualIndex = this.autocompleteOffset + this.selectedOperatorIndex;
+    if (this.filteredOperators.length > 0 && actualIndex < this.filteredOperators.length) {
+      this.selectOperator(this.filteredOperators[actualIndex]);
+    }
+  }
+
+  onCallsignKeydown(event: KeyboardEvent): void {
+    if (this.filteredOperators.length === 0) return;
+
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      this.selectCurrentOperator();
+    } else if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+      event.preventDefault();
+      this.selectCurrentOperator();
+    } else if (event.key === 'ArrowDown' || (event.ctrlKey && event.key === 'n')) {
+      event.preventDefault();
+      this.selectNextOperator();
+    } else if (event.key === 'ArrowUp' || (event.ctrlKey && event.key === 'p')) {
+      event.preventDefault();
+      this.selectPreviousOperator();
+    }
   }
 
   get displayedColumns(): string[] {

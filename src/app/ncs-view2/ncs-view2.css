@@ -67,6 +67,70 @@ table {
   border-radius: 4px;
 }
 
+.autocomplete-dropdown {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  max-width: 400px;
+}
+
+.autocomplete-header {
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #6c757d;
+}
+
+.autocomplete-results {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.autocomplete-item {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.autocomplete-item:hover {
+  background-color: #f0f0f0;
+}
+
+.autocomplete-item.selected {
+  background-color: var(--color-primary, #1e3a62);
+  color: white;
+  font-weight: 500;
+}
+
+.autocomplete-item.already-added {
+  color: #999;
+  font-style: italic;
+}
+
+.autocomplete-item.already-added.selected {
+  background-color: #ccc;
+  color: #666;
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.already-added-message {
+  padding: 0.5rem;
+  color: #dc3545;
+  font-weight: 500;
+  text-align: center;
+  background-color: #f8d7da;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+
 @media (min-width: 768px) {
   .filter-input {
     width: 250px;

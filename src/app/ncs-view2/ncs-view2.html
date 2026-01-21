@@ -22,6 +22,24 @@
     </div>
   </div>
 
+  <!-- Autocomplete dropdown for add row -->
+  <div class="autocomplete-dropdown" *ngIf="filteredOperators.length > 0">
+    <div class="autocomplete-header">{{ filteredOperators.length }} Matching Callsign{{ filteredOperators.length === 1 ? '' : 's' }}</div>
+    <div class="autocomplete-results">
+      <div
+        class="autocomplete-item"
+        *ngFor="let operator of filteredOperators.slice(autocompleteOffset, autocompleteOffset + 4); let i = index"
+        [class.selected]="i === selectedOperatorIndex"
+        [class.already-added]="isCallsignAlreadyAdded(operator.callsign)"
+        (click)="selectOperator(operator)">
+        {{ operator.callsign }} - {{ operator.name }}
+      </div>
+    </div>
+    <div class="already-added-message" *ngIf="selectedCallsignAlreadyAdded">
+      Already added
+    </div>
+  </div>
+
   <!-- Table -->
   <div class="table-container">
     <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
@@ -31,7 +49,10 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Callsign</th>
         <td mat-cell *matCellDef="let entry">
           <ng-container *ngIf="entry.isAddRow">
-            <input class="add-row-input" [formControl]="$any(entryForm.get('callsign'))" placeholder="Callsign">
+            <input class="add-row-input" [formControl]="$any(entryForm.get('callsign'))"
+                   (input)="onSearchOperator($any($event.target).value)"
+                   (keydown)="onCallsignKeydown($event)"
+                   placeholder="Callsign">
           </ng-container>
           <ng-container *ngIf="!entry.isAddRow">
             <span *ngIf="!entry.isEditing">{{ entry.callsign }}</span>
