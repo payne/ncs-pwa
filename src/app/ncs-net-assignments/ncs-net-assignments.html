@@ -55,7 +55,7 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Time In</th>
         <td mat-cell *matCellDef="let assignment">
           <ng-container *ngIf="assignment.isAddRow">
-            <input type="time" class="add-row-input" [formControl]="$any(assignmentForm.get('timeIn'))">
+            <input type="text" class="add-row-input" [formControl]="$any(assignmentForm.get('timeIn'))" placeholder="now">
           </ng-container>
           <ng-container *ngIf="!assignment.isAddRow">
             <span *ngIf="!assignment.isEditing">{{ formatTimeIn(assignment.timeIn) }}</span>

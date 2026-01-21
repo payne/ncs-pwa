@@ -169,10 +169,9 @@ export class NcsNetAssignments implements OnInit {
   }
 
   initializeForm(): void {
-    const currentTime = this.getCurrentTime();
     this.assignmentForm = this.fb.group({
       callsign: ['', Validators.required],
-      timeIn: [currentTime, Validators.required],
+      timeIn: [''],
       name: ['', Validators.required],
       duty: [this.lastDuty, Validators.required],
       milageStart: [0, [Validators.required, Validators.min(0)]],
@@ -304,8 +303,10 @@ export class NcsNetAssignments implements OnInit {
 
       const now = new Date();
       const timeInValue = this.assignmentForm.value.timeIn;
-      const [hours, minutes] = timeInValue.split(':');
-      now.setHours(parseInt(hours), parseInt(minutes), now.getSeconds(), now.getMilliseconds());
+      if (timeInValue) {
+        const [hours, minutes] = timeInValue.split(':');
+        now.setHours(parseInt(hours), parseInt(minutes), now.getSeconds(), now.getMilliseconds());
+      }
 
       this.lastDuty = this.assignmentForm.value.duty;
 
