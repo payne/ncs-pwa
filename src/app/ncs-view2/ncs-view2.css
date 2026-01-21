@@ -1,0 +1,80 @@
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-row h1 {
+  margin-bottom: 0;
+}
+
+.current-net-label {
+  font-size: 1rem;
+  color: #6c757d;
+  margin-right: 0.5rem;
+  font-weight: 400;
+}
+
+.current-net-name {
+  font-weight: 500;
+  color: var(--color-primary, #1e3a62);
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-input {
+  width: 200px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+}
+
+.add-row {
+  background-color: #f8f9fa;
+}
+
+.add-row-input {
+  width: 100%;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  box-sizing: border-box;
+}
+
+.add-row-input:focus {
+  outline: none;
+  border-color: var(--color-primary, #1e3a62);
+  box-shadow: 0 0 0 2px rgba(30, 58, 98, 0.1);
+}
+
+.edit-input {
+  width: 100%;
+  padding: 0.25rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+@media (min-width: 768px) {
+  .filter-input {
+    width: 250px;
+  }
+}
+
+@media (min-width: 992px) {
+  .header-row h1 {
+    font-size: 2rem;
+  }
+}

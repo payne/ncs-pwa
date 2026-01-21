@@ -1,0 +1,245 @@
+<div class="container-fluid">
+  <div class="header-row" *ngIf="currentNetName">
+    <h1>
+      <span class="current-net-label">Current NET:</span>
+      <span class="current-net-name">{{ currentNetName }}</span>
+    </h1>
+    <div class="header-controls">
+      <button mat-icon-button [matMenuTriggerFor]="columnMenu" matTooltip="Show/Hide Columns">
+        <mat-icon>view_column</mat-icon>
+      </button>
+      <mat-menu #columnMenu="matMenu">
+        <button mat-menu-item *ngFor="let col of allColumns" (click)="$event.stopPropagation(); toggleColumn(col)">
+          <mat-icon>{{ col.visible ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+          {{ col.label }}
+        </button>
+      </mat-menu>
+      <mat-form-field appearance="outline" class="filter-input">
+        <mat-label>Filter</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Search...">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+
+      <!-- Callsign Column -->
+      <ng-container matColumnDef="callsign">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Callsign</th>
+        <td mat-cell *matCellDef="let entry">
+          <ng-container *ngIf="entry.isAddRow">
+            <input class="add-row-input" [formControl]="$any(entryForm.get('callsign'))" placeholder="Callsign">
+          </ng-container>
+          <ng-container *ngIf="!entry.isAddRow">
+            <span *ngIf="!entry.isEditing">{{ entry.callsign }}</span>
+            <input *ngIf="entry.isEditing" [(ngModel)]="entry.callsign" class="edit-input">
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- First Name Column -->
+      <ng-container matColumnDef="firstName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>First Name</th>
+        <td mat-cell *matCellDef="let entry">
+          <ng-container *ngIf="entry.isAddRow">
+            <input class="add-row-input" [formControl]="$any(entryForm.get('firstName'))" placeholder="First Name">
+          </ng-container>
+          <ng-container *ngIf="!entry.isAddRow">
+            <span *ngIf="!entry.isEditing">{{ entry.firstName }}</span>
+            <input *ngIf="entry.isEditing" [(ngModel)]="entry.firstName" class="edit-input">
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- Last Name Column -->
+      <ng-container matColumnDef="lastName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Name</th>
+        <td mat-cell *matCellDef="let entry">
+          <ng-container *ngIf="entry.isAddRow">
+            <input class="add-row-input" [formControl]="$any(entryForm.get('lastName'))" placeholder="Last Name">
+          </ng-container>
+          <ng-container *ngIf="!entry.isAddRow">
+            <span *ngIf="!entry.isEditing">{{ entry.lastName }}</span>
+            <input *ngIf="entry.isEditing" [(ngModel)]="entry.lastName" class="edit-input">
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- Class Box A Column -->
+      <ng-container matColumnDef="classBoxA">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Class Box A</th>
+        <td mat-cell *matCellDef="let entry">
+          <ng-container *ngIf="entry.isAddRow">
+            <input class="add-row-input" [formControl]="$any(entryForm.get('classBoxA'))" placeholder="A">
+          </ng-container>
+          <ng-container *ngIf="!entry.isAddRow">
+            <span *ngIf="!entry.isEditing">{{ entry.classBoxA }}</span>
+            <input *ngIf="entry.isEditing" [(ngModel)]="entry.classBoxA" class="edit-input">
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- Class Box B Column -->
+      <ng-container matColumnDef="classBoxB">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Class Box B</th>
+        <td mat-cell *matCellDef="let entry">
+          <ng-container *ngIf="entry.isAddRow">
+            <input class="add-row-input" [formControl]="$any(entryForm.get('classBoxB'))" placeholder="B">
+          </ng-container>
+          <ng-container *ngIf="!entry.isAddRow">
+            <span *ngIf="!entry.isEditing">{{ entry.classBoxB }}</span>
+            <input *ngIf="entry.isEditing" [(ngModel)]="entry.classBoxB" class="edit-input">
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- WTR Column -->
+      <ng-container matColumnDef="wtr">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>WTR</th>
+        <td mat-cell *matCellDef="let entry">
+          <ng-container *ngIf="entry.isAddRow">
+            <input class="add-row-input" [formControl]="$any(entryForm.get('wtr'))" placeholder="WTR">
+          </ng-container>
+          <ng-container *ngIf="!entry.isAddRow">
+            <span *ngIf="!entry.isEditing">{{ entry.wtr }}</span>
+            <input *ngIf="entry.isEditing" [(ngModel)]="entry.wtr" class="edit-input">
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- Class Box D Column -->
+      <ng-container matColumnDef="classBoxD">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Class Box D</th>
+        <td mat-cell *matCellDef="let entry">
+          <ng-container *ngIf="entry.isAddRow">
+            <input class="add-row-input" [formControl]="$any(entryForm.get('classBoxD'))" placeholder="D">
+          </ng-container>
+          <ng-container *ngIf="!entry.isAddRow">
+            <span *ngIf="!entry.isEditing">{{ entry.classBoxD }}</span>
+            <input *ngIf="entry.isEditing" [(ngModel)]="entry.classBoxD" class="edit-input">
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- Class Box E Column -->
+      <ng-container matColumnDef="classBoxE">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Class Box E</th>
+        <td mat-cell *matCellDef="let entry">
+          <ng-container *ngIf="entry.isAddRow">
+            <input class="add-row-input" [formControl]="$any(entryForm.get('classBoxE'))" placeholder="E">
+          </ng-container>
+          <ng-container *ngIf="!entry.isAddRow">
+            <span *ngIf="!entry.isEditing">{{ entry.classBoxE }}</span>
+            <input *ngIf="entry.isEditing" [(ngModel)]="entry.classBoxE" class="edit-input">
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- Class Box F Column -->
+      <ng-container matColumnDef="classBoxF">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Class Box F</th>
+        <td mat-cell *matCellDef="let entry">
+          <ng-container *ngIf="entry.isAddRow">
+            <input class="add-row-input" [formControl]="$any(entryForm.get('classBoxF'))" placeholder="F">
+          </ng-container>
+          <ng-container *ngIf="!entry.isAddRow">
+            <span *ngIf="!entry.isEditing">{{ entry.classBoxF }}</span>
+            <input *ngIf="entry.isEditing" [(ngModel)]="entry.classBoxF" class="edit-input">
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- Class Box G Column -->
+      <ng-container matColumnDef="classBoxG">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Class Box G</th>
+        <td mat-cell *matCellDef="let entry">
+          <ng-container *ngIf="entry.isAddRow">
+            <input class="add-row-input" [formControl]="$any(entryForm.get('classBoxG'))" placeholder="G">
+          </ng-container>
+          <ng-container *ngIf="!entry.isAddRow">
+            <span *ngIf="!entry.isEditing">{{ entry.classBoxG }}</span>
+            <input *ngIf="entry.isEditing" [(ngModel)]="entry.classBoxG" class="edit-input">
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- Class Box H Column -->
+      <ng-container matColumnDef="classBoxH">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Class Box H</th>
+        <td mat-cell *matCellDef="let entry">
+          <ng-container *ngIf="entry.isAddRow">
+            <input class="add-row-input" [formControl]="$any(entryForm.get('classBoxH'))" placeholder="H">
+          </ng-container>
+          <ng-container *ngIf="!entry.isAddRow">
+            <span *ngIf="!entry.isEditing">{{ entry.classBoxH }}</span>
+            <input *ngIf="entry.isEditing" [(ngModel)]="entry.classBoxH" class="edit-input">
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- Header Name Column -->
+      <ng-container matColumnDef="headerName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Header Name</th>
+        <td mat-cell *matCellDef="let entry">
+          <ng-container *ngIf="entry.isAddRow">
+            <input class="add-row-input" [formControl]="$any(entryForm.get('headerName'))" placeholder="Header">
+          </ng-container>
+          <ng-container *ngIf="!entry.isAddRow">
+            <span *ngIf="!entry.isEditing">{{ entry.headerName }}</span>
+            <input *ngIf="entry.isEditing" [(ngModel)]="entry.headerName" class="edit-input">
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- Footer Info Column -->
+      <ng-container matColumnDef="footerInfo">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Footer Info</th>
+        <td mat-cell *matCellDef="let entry">
+          <ng-container *ngIf="entry.isAddRow">
+            <input class="add-row-input" [formControl]="$any(entryForm.get('footerInfo'))" placeholder="Footer">
+          </ng-container>
+          <ng-container *ngIf="!entry.isAddRow">
+            <span *ngIf="!entry.isEditing">{{ entry.footerInfo }}</span>
+            <input *ngIf="entry.isEditing" [(ngModel)]="entry.footerInfo" class="edit-input">
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let entry">
+          <ng-container *ngIf="entry.isAddRow">
+            <button mat-icon-button color="primary" (click)="addEntry()" [disabled]="!entryForm.valid" matTooltip="Add">
+              <mat-icon>add</mat-icon>
+            </button>
+          </ng-container>
+          <ng-container *ngIf="!entry.isAddRow">
+            <div *ngIf="!entry.isEditing">
+              <button mat-icon-button color="primary" (click)="enableEdit(entry)" matTooltip="Edit">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="deleteEntry(entry)" matTooltip="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+            <div *ngIf="entry.isEditing">
+              <button mat-icon-button color="primary" (click)="saveEdit(entry)" matTooltip="Save">
+                <mat-icon>check</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="cancelEdit(entry)" matTooltip="Cancel">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.add-row]="row.isAddRow"></tr>
+    </table>
+  </div>
+</div>

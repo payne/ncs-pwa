@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { getDatabase, Database, ref, set, onValue, push, remove, update, off } from 'firebase/database';
 import { NetAssignment } from '../_models/ncs-net-assignments.model';
+import { View2Entry } from '../_models/ncs-view2.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -101,5 +102,48 @@ export class FirebaseService {
         off(netsRef);
       };
     });
+  }
+
+  getView2Entries(netId: string): Observable<View2Entry[]> {
+    return new Observable(observer => {
+      const entriesRef = ref(this.db, `nets/${netId}/view2Entries`);
+
+      const unsubscribe = onValue(entriesRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          const entries: View2Entry[] = Object.keys(data).map(key => ({
+            ...data[key],
+            id: key
+          }));
+          observer.next(entries);
+        } else {
+          observer.next([]);
+        }
+      }, (error) => {
+        observer.error(error);
+      });
+
+      return () => {
+        off(entriesRef);
+      };
+    });
+  }
+
+  addView2Entry(netId: string, entry: View2Entry): Promise<void> {
+    const entriesRef = ref(this.db, `nets/${netId}/view2Entries`);
+    const newEntryRef = push(entriesRef);
+    const { id, ...entryWithoutId } = entry;
+    return set(newEntryRef, entryWithoutId);
+  }
+
+  updateView2Entry(netId: string, entryId: string, entry: Partial<View2Entry>): Promise<void> {
+    const entryRef = ref(this.db, `nets/${netId}/view2Entries/${entryId}`);
+    const { id, ...updateData } = entry;
+    return update(entryRef, updateData);
+  }
+
+  deleteView2Entry(netId: string, entryId: string): Promise<void> {
+    const entryRef = ref(this.db, `nets/${netId}/view2Entries/${entryId}`);
+    return remove(entryRef);
   }
 }
