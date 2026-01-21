@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, HostListener, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener, ChangeDetectorRef, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -63,7 +63,8 @@ export class NcsNetAssignments implements OnInit {
     private storageService: StorageService,
     private firebaseService: FirebaseService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private elementRef: ElementRef
   ) {}
 
   ngOnInit(): void {
@@ -226,6 +227,14 @@ export class NcsNetAssignments implements OnInit {
     this.selectedOperatorIndex = 0;
     this.autocompleteOffset = 0;
     this.selectedCallsignAlreadyAdded = false;
+
+    // Focus the add button so user can press Enter to add
+    setTimeout(() => {
+      const addButton = this.elementRef.nativeElement.querySelector('.add-row button');
+      if (addButton) {
+        addButton.focus();
+      }
+    });
   }
 
   selectNextOperator(): void {
