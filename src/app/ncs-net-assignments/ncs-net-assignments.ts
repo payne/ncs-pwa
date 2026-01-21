@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, HostListener, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener, ChangeDetectorRef, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -40,7 +40,7 @@ import { Operator } from '../_models/operator.model';
 })
 export class NcsNetAssignments implements OnInit {
   assignmentForm!: FormGroup;
-  dataSource!: MatTableDataSource<NetAssignment>;
+  dataSource!: MatTableDataSource<any>;
   displayedColumns: string[] = ['callsign', 'timeIn', 'name', 'duty', 'milageStart', 'classification', 'timeOut', 'milageEnd', 'actions'];
   operators: Operator[] = [];
   filteredOperators: Operator[] = [];
@@ -53,6 +53,7 @@ export class NcsNetAssignments implements OnInit {
   lastDuty: string = 'unassigned';
   currentNetId: string = '';
   currentNetName: string = '';
+  addRowPlaceholder: any = { isAddRow: true };
 
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -62,7 +63,8 @@ export class NcsNetAssignments implements OnInit {
     private storageService: StorageService,
     private firebaseService: FirebaseService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private elementRef: ElementRef
   ) {}
 
   ngOnInit(): void {
@@ -74,14 +76,15 @@ export class NcsNetAssignments implements OnInit {
 
     this.initializeForm();
     this.loadOperators();
-    this.dataSource = new MatTableDataSource<NetAssignment>(this.assignments);
+    this.dataSource = new MatTableDataSource<any>([this.addRowPlaceholder]);
     this.configureSorting();
+    this.configureFilter();
 
     this.selectNet(savedNetId);
   }
 
   configureSorting(): void {
-    this.dataSource.sortingDataAccessor = (item: NetAssignment, property: string) => {
+    this.dataSource.sortingDataAccessor = (item: any, property: string) => {
       switch (property) {
         case 'timeIn': return item.timeIn;
         case 'callsign': return item.callsign;
@@ -93,6 +96,28 @@ export class NcsNetAssignments implements OnInit {
         case 'milageEnd': return item.milageEnd;
         default: return '';
       }
+    };
+
+    // Override sortData to keep add row always at top
+    const defaultSort = this.dataSource.sortData;
+    this.dataSource.sortData = (data: any[], sort: MatSort) => {
+      const addRow = data.find(item => item.isAddRow);
+      const otherRows = data.filter(item => !item.isAddRow);
+      const sortedRows = defaultSort.call(this.dataSource, otherRows, sort);
+      return addRow ? [addRow, ...sortedRows] : sortedRows;
+    };
+  }
+
+  configureFilter(): void {
+    this.dataSource.filterPredicate = (data: any, filter: string) => {
+      if (data.isAddRow) return true;
+      const dataStr = [
+        data.callsign,
+        data.name,
+        data.duty,
+        data.classification
+      ].join(' ').toLowerCase();
+      return dataStr.includes(filter);
     };
   }
 
@@ -123,7 +148,7 @@ export class NcsNetAssignments implements OnInit {
     this.firebaseService.getAssignments(netId).subscribe({
       next: (assignments) => {
         this.assignments = assignments;
-        this.dataSource.data = this.assignments;
+        this.dataSource.data = [this.addRowPlaceholder, ...this.assignments];
       },
       error: (error) => {
         console.error('Error loading assignments:', error);
@@ -133,7 +158,7 @@ export class NcsNetAssignments implements OnInit {
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
-    this.dataSource.data = this.assignments;
+    this.dataSource.data = [this.addRowPlaceholder, ...this.assignments];
 
     if (this.sort) {
       this.sort.active = 'timeIn';
@@ -202,6 +227,14 @@ export class NcsNetAssignments implements OnInit {
     this.selectedOperatorIndex = 0;
     this.autocompleteOffset = 0;
     this.selectedCallsignAlreadyAdded = false;
+
+    // Focus the add button so user can press Enter to add
+    setTimeout(() => {
+      const addButton = this.elementRef.nativeElement.querySelector('.add-row button');
+      if (addButton) {
+        addButton.focus();
+      }
+    });
   }
 
   selectNextOperator(): void {
@@ -251,10 +284,10 @@ export class NcsNetAssignments implements OnInit {
     } else if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
       event.preventDefault();
       this.selectCurrentOperator();
-    } else if (event.ctrlKey && event.key === 'n') {
+    } else if (event.key === 'ArrowDown' || (event.ctrlKey && event.key === 'n')) {
       event.preventDefault();
       this.selectNextOperator();
-    } else if (event.ctrlKey && event.key === 'p') {
+    } else if (event.key === 'ArrowUp' || (event.ctrlKey && event.key === 'p')) {
       event.preventDefault();
       this.selectPreviousOperator();
     }

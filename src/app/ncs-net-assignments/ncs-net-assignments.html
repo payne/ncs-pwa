@@ -1,99 +1,32 @@
 <div class="container-fluid">
-  <h1 *ngIf="currentNetName">
-    <span class="current-net-label">Current NET:</span>
-    <span class="current-net-name">{{ currentNetName }}</span>
-  </h1>
-
-  <!-- Assignment Form and Autocomplete Section -->
-  <div class="form-and-autocomplete-wrapper">
-    <div class="form-container">
-      <h2>Add New Assignment</h2>
-      <form [formGroup]="assignmentForm" (ngSubmit)="addAssignment()">
-        <div class="row form-row g-2">
-          <div class="col-auto">
-            <mat-form-field appearance="outline" class="compact-field">
-              <mat-label>Callsign</mat-label>
-              <input matInput formControlName="callsign" (input)="onSearchOperator($any($event.target).value)" (keydown)="onCallsignKeydown($event)">
-            </mat-form-field>
-          </div>
-
-          <div class="col-auto">
-            <mat-form-field appearance="outline" class="compact-field">
-              <mat-label>Time In</mat-label>
-              <input matInput type="time" formControlName="timeIn">
-            </mat-form-field>
-          </div>
-
-          <div class="col-auto">
-            <mat-form-field appearance="outline" class="compact-field">
-              <mat-label>Name</mat-label>
-              <input matInput formControlName="name" (input)="onSearchOperator($any($event.target).value)">
-            </mat-form-field>
-          </div>
-
-          <div class="col-auto">
-            <mat-form-field appearance="outline" class="compact-field">
-              <mat-label>Duty</mat-label>
-              <mat-select formControlName="duty">
-                <mat-option *ngFor="let duty of duties" [value]="duty">
-                  {{ duty }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-
-          <div class="col-auto">
-            <mat-form-field appearance="outline" class="compact-field">
-              <mat-label>Milage Start</mat-label>
-              <input matInput type="number" formControlName="milageStart">
-            </mat-form-field>
-          </div>
-
-          <div class="col-auto">
-            <mat-form-field appearance="outline" class="compact-field">
-              <mat-label>Classification</mat-label>
-              <mat-select formControlName="classification">
-                <mat-option *ngFor="let classification of classifications" [value]="classification">
-                  {{ classification }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-
-          <div class="col-auto">
-            <button mat-raised-button color="primary" type="submit" [disabled]="!assignmentForm.valid" class="add-button">
-              Add
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
-
-    <div class="autocomplete-container" *ngIf="filteredOperators.length > 0">
-      <h2>{{ filteredOperators.length }} Matching Callsign{{ filteredOperators.length === 1 ? '' : 's' }}</h2>
-      <div class="autocomplete-results">
-        <div
-          class="autocomplete-item"
-          *ngFor="let operator of filteredOperators.slice(autocompleteOffset, autocompleteOffset + 4); let i = index"
-          [class.selected]="i === selectedOperatorIndex"
-          [class.already-added]="isCallsignAlreadyAdded(operator.callsign)"
-          (click)="selectOperator(operator)">
-          {{ operator.callsign }} - {{ operator.name }}
-        </div>
-      </div>
-      <div class="already-added-message" *ngIf="selectedCallsignAlreadyAdded">
-        Already added
-      </div>
-    </div>
-  </div>
-
-  <!-- Filter -->
-  <div class="filter-container">
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Filter Assignments</mat-label>
+  <div class="header-row" *ngIf="currentNetName">
+    <h1>
+      <span class="current-net-label">Current NET:</span>
+      <span class="current-net-name">{{ currentNetName }}</span>
+    </h1>
+    <mat-form-field appearance="outline" class="filter-input">
+      <mat-label>Filter</mat-label>
       <input matInput (keyup)="applyFilter($event)" placeholder="Search...">
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
+  </div>
+
+  <!-- Autocomplete dropdown for add row -->
+  <div class="autocomplete-dropdown" *ngIf="filteredOperators.length > 0">
+    <div class="autocomplete-header">{{ filteredOperators.length }} Matching Callsign{{ filteredOperators.length === 1 ? '' : 's' }}</div>
+    <div class="autocomplete-results">
+      <div
+        class="autocomplete-item"
+        *ngFor="let operator of filteredOperators.slice(autocompleteOffset, autocompleteOffset + 4); let i = index"
+        [class.selected]="i === selectedOperatorIndex"
+        [class.already-added]="isCallsignAlreadyAdded(operator.callsign)"
+        (click)="selectOperator(operator)">
+        {{ operator.callsign }} - {{ operator.name }}
+      </div>
+    </div>
+    <div class="already-added-message" *ngIf="selectedCallsignAlreadyAdded">
+      Already added
+    </div>
   </div>
 
   <!-- Assignments Table -->
@@ -104,8 +37,16 @@
       <ng-container matColumnDef="callsign">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Callsign</th>
         <td mat-cell *matCellDef="let assignment">
-          <span *ngIf="!assignment.isEditing">{{ assignment.callsign }}</span>
-          <input *ngIf="assignment.isEditing" [(ngModel)]="assignment.callsign" class="edit-input">
+          <ng-container *ngIf="assignment.isAddRow">
+            <input class="add-row-input" [formControl]="$any(assignmentForm.get('callsign'))"
+                   (input)="onSearchOperator($any($event.target).value)"
+                   (keydown)="onCallsignKeydown($event)"
+                   placeholder="Callsign">
+          </ng-container>
+          <ng-container *ngIf="!assignment.isAddRow">
+            <span *ngIf="!assignment.isEditing">{{ assignment.callsign }}</span>
+            <input *ngIf="assignment.isEditing" [(ngModel)]="assignment.callsign" class="edit-input">
+          </ng-container>
         </td>
       </ng-container>
 
@@ -113,8 +54,13 @@
       <ng-container matColumnDef="timeIn">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Time In</th>
         <td mat-cell *matCellDef="let assignment">
-          <span *ngIf="!assignment.isEditing">{{ formatTimeIn(assignment.timeIn) }}</span>
-          <input *ngIf="assignment.isEditing" type="time" [(ngModel)]="assignment.timeIn" class="edit-input">
+          <ng-container *ngIf="assignment.isAddRow">
+            <input type="time" class="add-row-input" [formControl]="$any(assignmentForm.get('timeIn'))">
+          </ng-container>
+          <ng-container *ngIf="!assignment.isAddRow">
+            <span *ngIf="!assignment.isEditing">{{ formatTimeIn(assignment.timeIn) }}</span>
+            <input *ngIf="assignment.isEditing" type="time" [(ngModel)]="assignment.timeIn" class="edit-input">
+          </ng-container>
         </td>
       </ng-container>
 
@@ -122,8 +68,15 @@
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
         <td mat-cell *matCellDef="let assignment">
-          <span *ngIf="!assignment.isEditing">{{ assignment.name }}</span>
-          <input *ngIf="assignment.isEditing" [(ngModel)]="assignment.name" class="edit-input">
+          <ng-container *ngIf="assignment.isAddRow">
+            <input class="add-row-input" [formControl]="$any(assignmentForm.get('name'))"
+                   (input)="onSearchOperator($any($event.target).value)"
+                   placeholder="Name">
+          </ng-container>
+          <ng-container *ngIf="!assignment.isAddRow">
+            <span *ngIf="!assignment.isEditing">{{ assignment.name }}</span>
+            <input *ngIf="assignment.isEditing" [(ngModel)]="assignment.name" class="edit-input">
+          </ng-container>
         </td>
       </ng-container>
 
@@ -131,8 +84,15 @@
       <ng-container matColumnDef="duty">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Duty</th>
         <td mat-cell *matCellDef="let assignment">
-          <span *ngIf="!assignment.isEditing">{{ assignment.duty }}</span>
-          <input *ngIf="assignment.isEditing" [(ngModel)]="assignment.duty" class="edit-input">
+          <ng-container *ngIf="assignment.isAddRow">
+            <select class="add-row-input add-row-select" [formControl]="$any(assignmentForm.get('duty'))">
+              <option *ngFor="let duty of duties" [value]="duty">{{ duty }}</option>
+            </select>
+          </ng-container>
+          <ng-container *ngIf="!assignment.isAddRow">
+            <span *ngIf="!assignment.isEditing">{{ assignment.duty }}</span>
+            <input *ngIf="assignment.isEditing" [(ngModel)]="assignment.duty" class="edit-input">
+          </ng-container>
         </td>
       </ng-container>
 
@@ -140,8 +100,13 @@
       <ng-container matColumnDef="milageStart">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Milage Start</th>
         <td mat-cell *matCellDef="let assignment">
-          <span *ngIf="!assignment.isEditing">{{ assignment.milageStart }}</span>
-          <input *ngIf="assignment.isEditing" type="number" [(ngModel)]="assignment.milageStart" class="edit-input">
+          <ng-container *ngIf="assignment.isAddRow">
+            <input type="number" class="add-row-input" [formControl]="$any(assignmentForm.get('milageStart'))" placeholder="0">
+          </ng-container>
+          <ng-container *ngIf="!assignment.isAddRow">
+            <span *ngIf="!assignment.isEditing">{{ assignment.milageStart }}</span>
+            <input *ngIf="assignment.isEditing" type="number" [(ngModel)]="assignment.milageStart" class="edit-input">
+          </ng-container>
         </td>
       </ng-container>
 
@@ -149,8 +114,15 @@
       <ng-container matColumnDef="classification">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Classification</th>
         <td mat-cell *matCellDef="let assignment">
-          <span *ngIf="!assignment.isEditing">{{ assignment.classification }}</span>
-          <input *ngIf="assignment.isEditing" [(ngModel)]="assignment.classification" class="edit-input">
+          <ng-container *ngIf="assignment.isAddRow">
+            <select class="add-row-input add-row-select" [formControl]="$any(assignmentForm.get('classification'))">
+              <option *ngFor="let classification of classifications" [value]="classification">{{ classification }}</option>
+            </select>
+          </ng-container>
+          <ng-container *ngIf="!assignment.isAddRow">
+            <span *ngIf="!assignment.isEditing">{{ assignment.classification }}</span>
+            <input *ngIf="assignment.isEditing" [(ngModel)]="assignment.classification" class="edit-input">
+          </ng-container>
         </td>
       </ng-container>
 
@@ -158,8 +130,13 @@
       <ng-container matColumnDef="timeOut">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Time Out</th>
         <td mat-cell *matCellDef="let assignment">
-          <span *ngIf="!assignment.isEditing">{{ assignment.timeOut }}</span>
-          <input *ngIf="assignment.isEditing" type="time" [(ngModel)]="assignment.timeOut" class="edit-input">
+          <ng-container *ngIf="assignment.isAddRow">
+            <span class="add-row-placeholder">-</span>
+          </ng-container>
+          <ng-container *ngIf="!assignment.isAddRow">
+            <span *ngIf="!assignment.isEditing">{{ assignment.timeOut }}</span>
+            <input *ngIf="assignment.isEditing" type="time" [(ngModel)]="assignment.timeOut" class="edit-input">
+          </ng-container>
         </td>
       </ng-container>
 
@@ -167,8 +144,13 @@
       <ng-container matColumnDef="milageEnd">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Milage End</th>
         <td mat-cell *matCellDef="let assignment">
-          <span *ngIf="!assignment.isEditing">{{ assignment.milageEnd }}</span>
-          <input *ngIf="assignment.isEditing" type="number" [(ngModel)]="assignment.milageEnd" class="edit-input">
+          <ng-container *ngIf="assignment.isAddRow">
+            <span class="add-row-placeholder">-</span>
+          </ng-container>
+          <ng-container *ngIf="!assignment.isAddRow">
+            <span *ngIf="!assignment.isEditing">{{ assignment.milageEnd }}</span>
+            <input *ngIf="assignment.isEditing" type="number" [(ngModel)]="assignment.milageEnd" class="edit-input">
+          </ng-container>
         </td>
       </ng-container>
 
@@ -176,30 +158,37 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Actions</th>
         <td mat-cell *matCellDef="let assignment">
-          <div *ngIf="!assignment.isEditing">
-            <button mat-icon-button color="accent" (click)="checkout(assignment)" matTooltip="Checkout">
-              <mat-icon>logout</mat-icon>
+          <ng-container *ngIf="assignment.isAddRow">
+            <button mat-icon-button color="primary" (click)="addAssignment()" [disabled]="!assignmentForm.valid" matTooltip="Add">
+              <mat-icon>add</mat-icon>
             </button>
-            <button mat-icon-button color="primary" (click)="enableEdit(assignment)" matTooltip="Edit">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" (click)="deleteAssignment(assignment)" matTooltip="Delete">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-          <div *ngIf="assignment.isEditing">
-            <button mat-icon-button color="primary" (click)="saveEdit(assignment)" matTooltip="Save">
-              <mat-icon>check</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" (click)="cancelEdit(assignment)" matTooltip="Cancel">
-              <mat-icon>close</mat-icon>
-            </button>
-          </div>
+          </ng-container>
+          <ng-container *ngIf="!assignment.isAddRow">
+            <div *ngIf="!assignment.isEditing">
+              <button mat-icon-button color="accent" (click)="checkout(assignment)" matTooltip="Checkout">
+                <mat-icon>logout</mat-icon>
+              </button>
+              <button mat-icon-button color="primary" (click)="enableEdit(assignment)" matTooltip="Edit">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="deleteAssignment(assignment)" matTooltip="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+            <div *ngIf="assignment.isEditing">
+              <button mat-icon-button color="primary" (click)="saveEdit(assignment)" matTooltip="Save">
+                <mat-icon>check</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="cancelEdit(assignment)" matTooltip="Cancel">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </ng-container>
         </td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.add-row]="row.isAddRow"></tr>
     </table>
   </div>
 </div>
