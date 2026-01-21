@@ -16,7 +16,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { OperatorService } from '../_services/operator.service';
 import { StorageService } from '../_services/storage.service';
 import { FirebaseService } from '../_services/firebase.service';
-import { NetAssignment } from '../_models/ncs-net-assignments.model';
+import { NetEntry } from '../_models/net-entry.model';
 import { Operator } from '../_models/operator.model';
 
 @Component({
@@ -59,7 +59,7 @@ export class NcsNetAssignments implements OnInit {
   selectedOperatorIndex: number = 0;
   autocompleteOffset: number = 0;
   selectedCallsignAlreadyAdded: boolean = false;
-  assignments: NetAssignment[] = [];
+  entries: NetEntry[] = [];
   duties: string[] = ['general', 'lead', 'scout', 'floater', 'unassigned'];
   classifications: string[] = ['full', 'partial', 'new', 'observer'];
   lastDuty: string = 'unassigned';
@@ -165,20 +165,20 @@ export class NcsNetAssignments implements OnInit {
       }
     });
 
-    this.firebaseService.getAssignments(netId).subscribe({
-      next: (assignments) => {
-        this.assignments = assignments;
-        this.dataSource.data = [this.addRowPlaceholder, ...this.assignments];
+    this.firebaseService.getEntries(netId).subscribe({
+      next: (entries) => {
+        this.entries = entries;
+        this.dataSource.data = [this.addRowPlaceholder, ...this.entries];
       },
       error: (error) => {
-        console.error('Error loading assignments:', error);
+        console.error('Error loading entries:', error);
       }
     });
   }
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
-    this.dataSource.data = [this.addRowPlaceholder, ...this.assignments];
+    this.dataSource.data = [this.addRowPlaceholder, ...this.entries];
 
     if (this.sort) {
       this.sort.active = 'timeIn';
@@ -225,8 +225,8 @@ export class NcsNetAssignments implements OnInit {
   }
 
   isCallsignAlreadyAdded(callsign: string): boolean {
-    return this.assignments.some(assignment =>
-      assignment.callsign.toLowerCase() === callsign.toLowerCase() && !assignment.timeOut
+    return this.entries.some(entry =>
+      entry.callsign.toLowerCase() === callsign.toLowerCase() && !entry.timeOut
     );
   }
 
@@ -330,25 +330,26 @@ export class NcsNetAssignments implements OnInit {
 
       this.lastDuty = this.assignmentForm.value.duty;
 
-      const newAssignment: NetAssignment = {
-        id: '',
+      const nameParts = this.assignmentForm.value.name.split(' ');
+      const newEntry: Partial<NetEntry> = {
         callsign: callsign,
         timeIn: now.toISOString(),
         name: this.assignmentForm.value.name,
+        firstName: nameParts[0] || '',
+        lastName: nameParts.slice(1).join(' ') || '',
         duty: this.assignmentForm.value.duty,
         milageStart: this.assignmentForm.value.milageStart,
         classification: this.assignmentForm.value.classification,
         timeOut: '',
-        milageEnd: 0,
-        isEditing: false
+        milageEnd: 0
       };
 
-      this.firebaseService.addAssignment(this.currentNetId, newAssignment).then(() => {
+      this.firebaseService.addEntry(this.currentNetId, newEntry).then(() => {
         this.assignmentForm.reset();
         this.initializeForm();
         this.focusCallsignInput();
       }).catch(error => {
-        console.error('Error adding assignment:', error);
+        console.error('Error adding entry:', error);
       });
     }
   }
@@ -374,36 +375,36 @@ export class NcsNetAssignments implements OnInit {
     }
   }
 
-  enableEdit(assignment: NetAssignment): void {
-    assignment.isEditing = true;
+  enableEdit(entry: NetEntry): void {
+    entry.isEditing = true;
   }
 
-  saveEdit(assignment: NetAssignment): void {
-    assignment.isEditing = false;
-    if (this.currentNetId && assignment.id) {
-      this.firebaseService.updateAssignment(this.currentNetId, assignment.id, assignment).catch(error => {
-        console.error('Error updating assignment:', error);
+  saveEdit(entry: NetEntry): void {
+    entry.isEditing = false;
+    if (this.currentNetId && entry.id) {
+      this.firebaseService.updateEntry(this.currentNetId, entry.id, entry).catch(error => {
+        console.error('Error updating entry:', error);
       });
     }
   }
 
-  cancelEdit(assignment: NetAssignment): void {
-    assignment.isEditing = false;
+  cancelEdit(entry: NetEntry): void {
+    entry.isEditing = false;
   }
 
-  checkout(assignment: NetAssignment): void {
+  checkout(entry: NetEntry): void {
     const timeOut = this.getCurrentTime();
-    if (this.currentNetId && assignment.id) {
-      this.firebaseService.updateAssignment(this.currentNetId, assignment.id, { timeOut }).catch(error => {
-        console.error('Error checking out assignment:', error);
+    if (this.currentNetId && entry.id) {
+      this.firebaseService.updateEntry(this.currentNetId, entry.id, { timeOut }).catch(error => {
+        console.error('Error checking out entry:', error);
       });
     }
   }
 
-  deleteAssignment(assignment: NetAssignment): void {
-    if (this.currentNetId && assignment.id) {
-      this.firebaseService.deleteAssignment(this.currentNetId, assignment.id).catch(error => {
-        console.error('Error deleting assignment:', error);
+  deleteAssignment(entry: NetEntry): void {
+    if (this.currentNetId && entry.id) {
+      this.firebaseService.deleteEntry(this.currentNetId, entry.id).catch(error => {
+        console.error('Error deleting entry:', error);
       });
     }
   }

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { getDatabase, Database, ref, set, onValue, push, remove, update, off } from 'firebase/database';
-import { NetAssignment } from '../_models/ncs-net-assignments.model';
-import { View2Entry } from '../_models/ncs-view2.model';
+import { NetEntry } from '../_models/net-entry.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -23,18 +22,19 @@ export class FirebaseService {
     return this.currentNetId;
   }
 
-  getAssignments(netId: string): Observable<NetAssignment[]> {
+  getEntries(netId: string): Observable<NetEntry[]> {
     return new Observable(observer => {
-      const assignmentsRef = ref(this.db, `nets/${netId}/assignments`);
+      const entriesRef = ref(this.db, `nets/${netId}/entries`);
 
-      const unsubscribe = onValue(assignmentsRef, (snapshot) => {
+      const unsubscribe = onValue(entriesRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
-          const assignments: NetAssignment[] = Object.keys(data).map(key => ({
+          const entries: NetEntry[] = Object.keys(data).map(key => ({
+            ...this.getDefaultEntry(),
             ...data[key],
             id: key
           }));
-          observer.next(assignments);
+          observer.next(entries);
         } else {
           observer.next([]);
         }
@@ -43,27 +43,27 @@ export class FirebaseService {
       });
 
       return () => {
-        off(assignmentsRef);
+        off(entriesRef);
       };
     });
   }
 
-  addAssignment(netId: string, assignment: NetAssignment): Promise<void> {
-    const assignmentsRef = ref(this.db, `nets/${netId}/assignments`);
-    const newAssignmentRef = push(assignmentsRef);
-    const { id, ...assignmentWithoutId } = assignment;
-    return set(newAssignmentRef, assignmentWithoutId);
+  addEntry(netId: string, entry: Partial<NetEntry>): Promise<void> {
+    const entriesRef = ref(this.db, `nets/${netId}/entries`);
+    const newEntryRef = push(entriesRef);
+    const { id, isEditing, ...entryWithoutId } = entry as any;
+    return set(newEntryRef, entryWithoutId);
   }
 
-  updateAssignment(netId: string, assignmentId: string, assignment: Partial<NetAssignment>): Promise<void> {
-    const assignmentRef = ref(this.db, `nets/${netId}/assignments/${assignmentId}`);
-    const { id, ...updateData } = assignment;
-    return update(assignmentRef, updateData);
+  updateEntry(netId: string, entryId: string, entry: Partial<NetEntry>): Promise<void> {
+    const entryRef = ref(this.db, `nets/${netId}/entries/${entryId}`);
+    const { id, isEditing, ...updateData } = entry as any;
+    return update(entryRef, updateData);
   }
 
-  deleteAssignment(netId: string, assignmentId: string): Promise<void> {
-    const assignmentRef = ref(this.db, `nets/${netId}/assignments/${assignmentId}`);
-    return remove(assignmentRef);
+  deleteEntry(netId: string, entryId: string): Promise<void> {
+    const entryRef = ref(this.db, `nets/${netId}/entries/${entryId}`);
+    return remove(entryRef);
   }
 
   createNet(netName: string): Promise<string> {
@@ -74,7 +74,7 @@ export class FirebaseService {
     return set(newNetRef, {
       name: netName,
       createdAt: Date.now(),
-      assignments: {}
+      entries: {}
     }).then(() => netId);
   }
 
@@ -104,46 +104,29 @@ export class FirebaseService {
     });
   }
 
-  getView2Entries(netId: string): Observable<View2Entry[]> {
-    return new Observable(observer => {
-      const entriesRef = ref(this.db, `nets/${netId}/view2Entries`);
-
-      const unsubscribe = onValue(entriesRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          const entries: View2Entry[] = Object.keys(data).map(key => ({
-            ...data[key],
-            id: key
-          }));
-          observer.next(entries);
-        } else {
-          observer.next([]);
-        }
-      }, (error) => {
-        observer.error(error);
-      });
-
-      return () => {
-        off(entriesRef);
-      };
-    });
-  }
-
-  addView2Entry(netId: string, entry: View2Entry): Promise<void> {
-    const entriesRef = ref(this.db, `nets/${netId}/view2Entries`);
-    const newEntryRef = push(entriesRef);
-    const { id, ...entryWithoutId } = entry;
-    return set(newEntryRef, entryWithoutId);
-  }
-
-  updateView2Entry(netId: string, entryId: string, entry: Partial<View2Entry>): Promise<void> {
-    const entryRef = ref(this.db, `nets/${netId}/view2Entries/${entryId}`);
-    const { id, ...updateData } = entry;
-    return update(entryRef, updateData);
-  }
-
-  deleteView2Entry(netId: string, entryId: string): Promise<void> {
-    const entryRef = ref(this.db, `nets/${netId}/view2Entries/${entryId}`);
-    return remove(entryRef);
+  private getDefaultEntry(): NetEntry {
+    return {
+      id: '',
+      callsign: '',
+      timeIn: '',
+      name: '',
+      duty: '',
+      milageStart: 0,
+      classification: '',
+      timeOut: '',
+      milageEnd: 0,
+      firstName: '',
+      lastName: '',
+      classBoxA: '',
+      classBoxB: '',
+      wtr: '',
+      classBoxD: '',
+      classBoxE: '',
+      classBoxF: '',
+      classBoxG: '',
+      classBoxH: '',
+      headerName: '',
+      footerInfo: ''
+    };
   }
 }

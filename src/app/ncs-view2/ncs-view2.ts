@@ -13,7 +13,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FirebaseService } from '../_services/firebase.service';
 import { OperatorService } from '../_services/operator.service';
-import { View2Entry } from '../_models/ncs-view2.model';
+import { NetEntry } from '../_models/net-entry.model';
 import { Operator } from '../_models/operator.model';
 
 @Component({
@@ -54,7 +54,7 @@ export class NcsView2 implements OnInit {
     { key: 'footerInfo', label: 'Footer Info', visible: true },
     { key: 'actions', label: 'Actions', visible: true }
   ];
-  entries: View2Entry[] = [];
+  entries: NetEntry[] = [];
   operators: Operator[] = [];
   filteredOperators: Operator[] = [];
   selectedOperatorIndex: number = 0;
@@ -244,13 +244,13 @@ export class NcsView2 implements OnInit {
       }
     });
 
-    this.firebaseService.getView2Entries(netId).subscribe({
+    this.firebaseService.getEntries(netId).subscribe({
       next: (entries) => {
         this.entries = entries;
         this.dataSource.data = [this.addRowPlaceholder, ...this.entries];
       },
       error: (error) => {
-        console.error('Error loading view2 entries:', error);
+        console.error('Error loading entries:', error);
       }
     });
   }
@@ -281,11 +281,14 @@ export class NcsView2 implements OnInit {
 
   addEntry(): void {
     if (this.entryForm.valid && this.currentNetId) {
-      const newEntry: View2Entry = {
-        id: '',
+      const firstName = this.entryForm.value.firstName || '';
+      const lastName = this.entryForm.value.lastName || '';
+      const newEntry: Partial<NetEntry> = {
         callsign: this.entryForm.value.callsign,
-        firstName: this.entryForm.value.firstName || '',
-        lastName: this.entryForm.value.lastName || '',
+        firstName: firstName,
+        lastName: lastName,
+        name: `${firstName} ${lastName}`.trim(),
+        timeIn: new Date().toISOString(),
         classBoxA: this.entryForm.value.classBoxA || '',
         classBoxB: this.entryForm.value.classBoxB || '',
         wtr: this.entryForm.value.wtr || '',
@@ -295,11 +298,10 @@ export class NcsView2 implements OnInit {
         classBoxG: this.entryForm.value.classBoxG || '',
         classBoxH: this.entryForm.value.classBoxH || '',
         headerName: this.entryForm.value.headerName || '',
-        footerInfo: this.entryForm.value.footerInfo || '',
-        isEditing: false
+        footerInfo: this.entryForm.value.footerInfo || ''
       };
 
-      this.firebaseService.addView2Entry(this.currentNetId, newEntry).then(() => {
+      this.firebaseService.addEntry(this.currentNetId, newEntry).then(() => {
         this.entryForm.reset();
         this.initializeForm();
         this.focusCallsignInput();
@@ -318,26 +320,26 @@ export class NcsView2 implements OnInit {
     });
   }
 
-  enableEdit(entry: View2Entry): void {
+  enableEdit(entry: NetEntry): void {
     entry.isEditing = true;
   }
 
-  saveEdit(entry: View2Entry): void {
+  saveEdit(entry: NetEntry): void {
     entry.isEditing = false;
     if (this.currentNetId && entry.id) {
-      this.firebaseService.updateView2Entry(this.currentNetId, entry.id, entry).catch(error => {
+      this.firebaseService.updateEntry(this.currentNetId, entry.id, entry).catch(error => {
         console.error('Error updating entry:', error);
       });
     }
   }
 
-  cancelEdit(entry: View2Entry): void {
+  cancelEdit(entry: NetEntry): void {
     entry.isEditing = false;
   }
 
-  deleteEntry(entry: View2Entry): void {
+  deleteEntry(entry: NetEntry): void {
     if (this.currentNetId && entry.id) {
-      this.firebaseService.deleteView2Entry(this.currentNetId, entry.id).catch(error => {
+      this.firebaseService.deleteEntry(this.currentNetId, entry.id).catch(error => {
         console.error('Error deleting entry:', error);
       });
     }
