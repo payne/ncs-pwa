@@ -326,10 +326,20 @@ export class NcsNetAssignments implements OnInit {
       this.firebaseService.addAssignment(this.currentNetId, newAssignment).then(() => {
         this.assignmentForm.reset();
         this.initializeForm();
+        this.focusCallsignInput();
       }).catch(error => {
         console.error('Error adding assignment:', error);
       });
     }
+  }
+
+  focusCallsignInput(): void {
+    setTimeout(() => {
+      const callsignInput = this.elementRef.nativeElement.querySelector('.add-row input');
+      if (callsignInput) {
+        callsignInput.focus();
+      }
+    });
   }
 
   formatTimeIn(timeIn: string): string {
