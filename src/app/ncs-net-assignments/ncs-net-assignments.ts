@@ -12,6 +12,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatMenuModule } from '@angular/material/menu';
 import { OperatorService } from '../_services/operator.service';
 import { StorageService } from '../_services/storage.service';
 import { FirebaseService } from '../_services/firebase.service';
@@ -33,7 +34,8 @@ import { Operator } from '../_models/operator.model';
     MatAutocompleteModule,
     MatSelectModule,
     MatTooltipModule,
-    MatDialogModule
+    MatDialogModule,
+    MatMenuModule
   ],
   templateUrl: './ncs-net-assignments.html',
   styleUrl: './ncs-net-assignments.css',
@@ -41,7 +43,17 @@ import { Operator } from '../_models/operator.model';
 export class NcsNetAssignments implements OnInit {
   assignmentForm!: FormGroup;
   dataSource!: MatTableDataSource<any>;
-  displayedColumns: string[] = ['callsign', 'timeIn', 'name', 'duty', 'milageStart', 'classification', 'timeOut', 'milageEnd', 'actions'];
+  allColumns: { key: string; label: string; visible: boolean }[] = [
+    { key: 'callsign', label: 'Callsign', visible: true },
+    { key: 'timeIn', label: 'Time In', visible: true },
+    { key: 'name', label: 'Name', visible: true },
+    { key: 'duty', label: 'Duty', visible: true },
+    { key: 'milageStart', label: 'Milage Start', visible: true },
+    { key: 'classification', label: 'Classification', visible: true },
+    { key: 'timeOut', label: 'Time Out', visible: true },
+    { key: 'milageEnd', label: 'Milage End', visible: true },
+    { key: 'actions', label: 'Actions', visible: true }
+  ];
   operators: Operator[] = [];
   filteredOperators: Operator[] = [];
   selectedOperatorIndex: number = 0;
@@ -66,6 +78,14 @@ export class NcsNetAssignments implements OnInit {
     private cdr: ChangeDetectorRef,
     private elementRef: ElementRef
   ) {}
+
+  get displayedColumns(): string[] {
+    return this.allColumns.filter(col => col.visible).map(col => col.key);
+  }
+
+  toggleColumn(column: { key: string; label: string; visible: boolean }): void {
+    column.visible = !column.visible;
+  }
 
   ngOnInit(): void {
     const savedNetId = localStorage.getItem('currentNetId');

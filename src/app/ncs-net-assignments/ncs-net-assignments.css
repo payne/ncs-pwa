@@ -23,6 +23,12 @@
   color: var(--color-primary, #1e3a62);
 }
 
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .filter-input {
   width: 200px;
 }
