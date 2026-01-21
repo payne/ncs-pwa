@@ -275,10 +275,10 @@ export class NcsNetAssignments implements OnInit {
     } else if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
       event.preventDefault();
       this.selectCurrentOperator();
-    } else if (event.ctrlKey && event.key === 'n') {
+    } else if (event.key === 'ArrowDown' || (event.ctrlKey && event.key === 'n')) {
       event.preventDefault();
       this.selectNextOperator();
-    } else if (event.ctrlKey && event.key === 'p') {
+    } else if (event.key === 'ArrowUp' || (event.ctrlKey && event.key === 'p')) {
       event.preventDefault();
       this.selectPreviousOperator();
     }
