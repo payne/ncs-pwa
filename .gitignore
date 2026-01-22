@@ -29,7 +29,8 @@ yarn-error.log
 .history/*
 
 # Auto-generated version file
-/src/environments/version.ts
+# Do not exclude this since it seems to not be generated on firebase.com, so I'll do it locally.
+# /src/environments/version.ts
 
 # Miscellaneous
 /.angular/cache
