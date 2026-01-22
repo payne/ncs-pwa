@@ -358,4 +358,36 @@ export class NcsView2 implements OnInit {
     const col = this.allColumns.find(c => c.key === key);
     return col ? col.visible : false;
   }
+
+  downloadCsv(): void {
+    const visibleColumns = this.allColumns.filter(col => col.visible && col.key !== 'actions');
+    const headers = visibleColumns.map(col => col.label);
+
+    const rows = this.entries.map(entry => {
+      return visibleColumns.map(col => {
+        let value = (entry as any)[col.key];
+        if (value === null || value === undefined) value = '';
+        const stringValue = String(value);
+        if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+          return `"${stringValue.replace(/"/g, '""')}"`;
+        }
+        return stringValue;
+      }).join(',');
+    });
+
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    const date = new Date().toISOString().split('T')[0];
+    const filename = `view2-${this.currentNetName || 'export'}-${date}.csv`;
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 }

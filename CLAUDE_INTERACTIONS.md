@@ -270,6 +270,22 @@ In the `/ncs-people` route display a table of the people. Each cell should be ed
 
 ---
 
+### Interaction 21: Add CSV Download Button
+**User Prompt:**
+In both `/ncs-net-assignments` and `/ncs-view2` routes add a CSV download button to the left of the `Show/Hide Columns` button.
+
+**Claude Actions:**
+- Updated `ncs-net-assignments.html` to add download button with `download` icon
+- Added `downloadCsv()` method to `ncs-net-assignments.ts`:
+  - Exports only visible columns (excludes actions column)
+  - Formats timeIn values properly
+  - Handles CSV escaping for commas, quotes, and newlines
+  - Filename includes net name and date
+- Updated `ncs-view2.html` to add download button with `download` icon
+- Added `downloadCsv()` method to `ncs-view2.ts` with same functionality
+
+---
+
 ## Future Interactions
 
 *(New interactions will be appended below)*

@@ -416,6 +416,41 @@ export class NcsNetAssignments implements OnInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
+  downloadCsv(): void {
+    const visibleColumns = this.allColumns.filter(col => col.visible && col.key !== 'actions');
+    const headers = visibleColumns.map(col => col.label);
+
+    const rows = this.entries.map(entry => {
+      return visibleColumns.map(col => {
+        let value = (entry as any)[col.key];
+        if (col.key === 'timeIn' || col.key === 'timeOut') {
+          value = col.key === 'timeIn' ? this.formatTimeIn(value) : value;
+        }
+        if (value === null || value === undefined) value = '';
+        const stringValue = String(value);
+        if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+          return `"${stringValue.replace(/"/g, '""')}"`;
+        }
+        return stringValue;
+      }).join(',');
+    });
+
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    const date = new Date().toISOString().split('T')[0];
+    const filename = `net-assignments-${this.currentNetName || 'export'}-${date}.csv`;
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   private generateId(): string {
     return Date.now().toString() + Math.random().toString(36).substr(2, 9);
   }

@@ -5,6 +5,9 @@
       <span class="current-net-name">{{ currentNetName }}</span>
     </h1>
     <div class="header-controls">
+      <button mat-icon-button (click)="downloadCsv()" matTooltip="Download CSV">
+        <mat-icon>download</mat-icon>
+      </button>
       <button mat-icon-button [matMenuTriggerFor]="columnMenu" matTooltip="Show/Hide Columns">
         <mat-icon>view_column</mat-icon>
       </button>

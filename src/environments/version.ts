@@ -2,6 +2,6 @@
 // Do not edit manually
 
 export const versionInfo = {
-  gitHash: 'eec1fd2',
-  buildDate: '2026-01-22T22:06:02.638Z'
+  gitHash: '778230a',
+  buildDate: '2026-01-22T22:11:46.772Z'
 };
