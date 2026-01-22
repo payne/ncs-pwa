@@ -154,6 +154,17 @@ export class FirebaseService {
     });
   }
 
+  updatePerson(personId: string, data: Partial<Operator>): Promise<void> {
+    const personRef = ref(this.db, `people/${personId}`);
+    const { id, ...updateData } = data as any;
+    return update(personRef, updateData);
+  }
+
+  deletePerson(personId: string): Promise<void> {
+    const personRef = ref(this.db, `people/${personId}`);
+    return remove(personRef);
+  }
+
   private getDefaultEntry(): NetEntry {
     return {
       id: '',

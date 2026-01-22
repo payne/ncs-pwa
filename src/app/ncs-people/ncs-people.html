@@ -1,4 +1,87 @@
-<div class="container">
-  <h1>People (Operators)</h1>
-  <p>Manage operators and personnel information here.</p>
+<div class="container-fluid">
+  <div class="header-row">
+    <h1>People</h1>
+    <div class="header-controls">
+      <mat-form-field appearance="outline" class="filter-input">
+        <mat-label>Filter</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Search...">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+
+      <!-- Callsign Column -->
+      <ng-container matColumnDef="callsign">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Callsign</th>
+        <td mat-cell *matCellDef="let person">
+          <ng-container *ngIf="person.isNew">
+            <input class="cell-input" [(ngModel)]="addRowPlaceholder.callsign" placeholder="Callsign">
+          </ng-container>
+          <ng-container *ngIf="!person.isNew">
+            <input class="cell-input" [value]="person.callsign"
+                   (blur)="onCellBlur(person, 'callsign', $any($event.target).value)">
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+        <td mat-cell *matCellDef="let person">
+          <ng-container *ngIf="person.isNew">
+            <input class="cell-input" [(ngModel)]="addRowPlaceholder.name" placeholder="Name">
+          </ng-container>
+          <ng-container *ngIf="!person.isNew">
+            <input class="cell-input" [value]="person.name"
+                   (blur)="onCellBlur(person, 'name', $any($event.target).value)">
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- Clubs Column -->
+      <ng-container matColumnDef="clubs">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Clubs</th>
+        <td mat-cell *matCellDef="let person">
+          <ng-container *ngIf="person.isNew">
+            <input class="cell-input" [value]="getClubsString(addRowPlaceholder.clubs)"
+                   (blur)="onAddRowClubsBlur($any($event.target).value)"
+                   placeholder="CLUB1, CLUB2">
+          </ng-container>
+          <ng-container *ngIf="!person.isNew">
+            <input class="cell-input" [value]="getClubsString(person.clubs)"
+                   (blur)="onClubsBlur(person, $any($event.target).value)">
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="actions-header"></th>
+        <td mat-cell *matCellDef="let person" class="actions-cell">
+          <ng-container *ngIf="person.isNew">
+            <button mat-icon-button color="primary" (click)="addPerson()" matTooltip="Add">
+              <mat-icon>add</mat-icon>
+            </button>
+          </ng-container>
+          <ng-container *ngIf="!person.isNew">
+            <button mat-icon-button [matMenuTriggerFor]="actionMenu" class="action-menu-btn">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #actionMenu="matMenu">
+              <button mat-menu-item (click)="deletePerson(person)" class="delete-action">
+                <mat-icon color="warn">delete</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.add-row]="row.isNew"></tr>
+    </table>
+  </div>
 </div>

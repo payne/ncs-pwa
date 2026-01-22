@@ -247,6 +247,29 @@ Right now `members.json` is used to populate the internal database used for call
 
 ---
 
+### Interaction 20: Create Editable People Table
+**User Prompt:**
+In the `/ncs-people` route display a table of the people. Each cell should be editable and have auto save.
+
+**Claude Actions:**
+- Added `updatePerson()` and `deletePerson()` methods to `firebase.service.ts`
+- Added optional `id` field to `Operator` model
+- Updated `ncs-people.ts` with:
+  - Table displaying people from Firebase `people` collection
+  - Editable cells that auto-save on blur
+  - Add row at the top for creating new people
+  - Filter functionality
+  - Sorting with add row always at top
+- Created `ncs-people.html` with:
+  - Material table with columns: Callsign, Name, Clubs, Actions
+  - Each cell is an input field that saves automatically when focus leaves
+  - Clubs displayed as comma-separated and parsed back on blur
+  - Add button for new person row
+  - Delete action in menu for existing people
+- Created `ncs-people.css` with compact table styling matching other views
+
+---
+
 ## Future Interactions
 
 *(New interactions will be appended below)*
