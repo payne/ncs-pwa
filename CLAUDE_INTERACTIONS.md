@@ -229,6 +229,24 @@ Please put the build date and git commit hash in the `/ncs-about` route so I can
 
 ---
 
+### Interaction 19: Sync members.json to Firebase people Collection
+**User Prompt:**
+Right now `members.json` is used to populate the internal database used for callsign and name matching. Instead, use `members.json` as one way to add people to the `people` document in firestore's realtime database. If a person exists in `members.json` but not in the `people` document add them to the `people` document. If someone exists in people but not `members.json` take no action -- just log it to the console.
+
+**Claude Actions:**
+- Added to `firebase.service.ts`:
+  - `getPeople()` - Observable to get people from Firebase `people` collection
+  - `getPeopleOnce()` - Promise-based one-time fetch for sync operations
+  - `addPerson()` - Add a person to the Firebase `people` collection
+- Updated `operator.service.ts`:
+  - Changed `getOperators()` to return data from Firebase instead of members.json
+  - Added `syncMembersToFirebase()` method that runs on service initialization
+  - Sync logic: adds anyone from members.json not in Firebase
+  - Logs anyone in Firebase but not in members.json (no deletion)
+  - Uses callsign as the unique identifier (case-insensitive comparison)
+
+---
+
 ## Future Interactions
 
 *(New interactions will be appended below)*

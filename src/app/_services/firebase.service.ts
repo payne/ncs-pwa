@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { getDatabase, Database, ref, set, onValue, push, remove, update, off } from 'firebase/database';
+import { getDatabase, Database, ref, set, onValue, push, remove, update, off, get } from 'firebase/database';
 import { NetEntry } from '../_models/net-entry.model';
+import { Operator } from '../_models/operator.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -101,6 +102,55 @@ export class FirebaseService {
       return () => {
         off(netsRef);
       };
+    });
+  }
+
+  // People collection methods
+  getPeople(): Observable<Operator[]> {
+    return new Observable(observer => {
+      const peopleRef = ref(this.db, 'people');
+
+      const unsubscribe = onValue(peopleRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          const people: Operator[] = Object.keys(data).map(key => ({
+            ...data[key],
+            id: key
+          }));
+          observer.next(people);
+        } else {
+          observer.next([]);
+        }
+      }, (error) => {
+        observer.error(error);
+      });
+
+      return () => {
+        off(peopleRef);
+      };
+    });
+  }
+
+  async getPeopleOnce(): Promise<Operator[]> {
+    const peopleRef = ref(this.db, 'people');
+    const snapshot = await get(peopleRef);
+    const data = snapshot.val();
+    if (data) {
+      return Object.keys(data).map(key => ({
+        ...data[key],
+        id: key
+      }));
+    }
+    return [];
+  }
+
+  addPerson(person: Operator): Promise<void> {
+    const peopleRef = ref(this.db, 'people');
+    const newPersonRef = push(peopleRef);
+    return set(newPersonRef, {
+      name: person.name,
+      callsign: person.callsign,
+      clubs: person.clubs || []
     });
   }
 
