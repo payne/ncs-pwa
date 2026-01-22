@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { versionInfo } from '../../environments/version';
 
 @Component({
   selector: 'app-ncs-about',
@@ -7,5 +8,11 @@ import { Component } from '@angular/core';
   styleUrl: './ncs-about.css',
 })
 export class NcsAbout {
+  gitHash = versionInfo.gitHash;
+  buildDate = this.formatBuildDate(versionInfo.buildDate);
 
+  private formatBuildDate(isoDate: string): string {
+    const date = new Date(isoDate);
+    return date.toLocaleString();
+  }
 }

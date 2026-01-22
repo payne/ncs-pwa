@@ -28,6 +28,9 @@ yarn-error.log
 !.vscode/extensions.json
 .history/*
 
+# Auto-generated version file
+/src/environments/version.ts
+
 # Miscellaneous
 /.angular/cache
 .sass-cache/

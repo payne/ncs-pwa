@@ -8,9 +8,24 @@ h1 {
   margin-bottom: 1.5rem;
 }
 
+.version-info {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.version-info h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.version-info p {
+  margin-bottom: 0.5rem;
+}
+
 .license-info {
-  margin-top: 3rem;
-  padding-top: 2rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
   border-top: 1px solid #e0e0e0;
 }
 

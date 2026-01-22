@@ -215,6 +215,20 @@ In the `ncs-net-assignments` route, when a person is checked in the duty and cla
 
 ---
 
+### Interaction 18: Add Build Date and Git Commit Hash to About Page
+**User Prompt:**
+Please put the build date and git commit hash in the `/ncs-about` route so I can know which version of the program is in use.
+
+**Claude Actions:**
+- Created `scripts/generate-version.js` that extracts git hash and build date
+- Updated `package.json` to add `prebuild` and `prestart` scripts that run the version generator
+- Added `/src/environments/version.ts` to `.gitignore` since it's auto-generated
+- Updated `ncs-about.ts` to import versionInfo and format the build date
+- Updated `ncs-about.html` to display the build date and git commit hash
+- Added styling for the version info section in `ncs-about.css`
+
+---
+
 ## Future Interactions
 
 *(New interactions will be appended below)*
