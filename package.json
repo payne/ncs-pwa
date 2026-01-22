@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "update-version": "node scripts/generate-version.js",
+    "update-version": "node local-scripts/generate-version.js",
     "build": "ng build",
     "build:prod": "ng build --configuration production",
     "deploy": "npm run build:prod && firebase deploy",
