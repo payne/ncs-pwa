@@ -185,6 +185,24 @@ Even when someone is entered using `view 2` still track the time they checked in
 
 ---
 
+### Interaction 16: Compact and Responsive Tables
+**User Prompt:**
+Make the tables in both ncs-view and ncs-net-assignments route have less blank space. Use a `...` or bento box icon to choose the action (checkout, edit, delete) instead of having three icons. Make columns like `Milage Start` and others only as wide as they need to be. It's important that the application is responsive and looks good on a computer, tablet, or phone.
+
+**Claude Actions:**
+- Updated `ncs-net-assignments.html` to replace individual action buttons with a dropdown menu using `mat-menu` and `more_vert` icon
+- Updated `ncs-net-assignments.css` with compact table styles:
+  - Reduced cell padding
+  - Smaller font sizes (0.8rem for cells, 0.75rem for headers)
+  - Reduced row height (40px)
+  - Fixed width on actions column (48px)
+  - Added responsive media queries for different screen sizes
+- Updated `ncs-view2.html` with the same dropdown menu pattern for actions
+- Updated `ncs-view2.css` with matching compact styles and responsive media queries
+- Build verified successfully
+
+---
+
 ## Future Interactions
 
 *(New interactions will be appended below)*
