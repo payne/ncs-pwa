@@ -63,6 +63,7 @@ export class NcsNetAssignments implements OnInit {
   duties: string[] = ['general', 'lead', 'scout', 'floater', 'unassigned'];
   classifications: string[] = ['full', 'partial', 'new', 'observer'];
   lastDuty: string = 'unassigned';
+  lastClassification: string = 'observer';
   currentNetId: string = '';
   currentNetName: string = '';
   addRowPlaceholder: any = { isAddRow: true };
@@ -195,7 +196,7 @@ export class NcsNetAssignments implements OnInit {
       name: ['', Validators.required],
       duty: [this.lastDuty, Validators.required],
       milageStart: [0, [Validators.required, Validators.min(0)]],
-      classification: ['observer', Validators.required]
+      classification: [this.lastClassification, Validators.required]
     });
   }
 
@@ -329,6 +330,7 @@ export class NcsNetAssignments implements OnInit {
       }
 
       this.lastDuty = this.assignmentForm.value.duty;
+      this.lastClassification = this.assignmentForm.value.classification;
 
       const nameParts = this.assignmentForm.value.name.split(' ');
       const newEntry: Partial<NetEntry> = {

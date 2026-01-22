@@ -203,6 +203,18 @@ Make the tables in both ncs-view and ncs-net-assignments route have less blank s
 
 ---
 
+### Interaction 17: Default Duty and Classification to Previous Values
+**User Prompt:**
+In the `ncs-net-assignments` route, when a person is checked in the duty and classification should default to what they were for the person checked in right before them.
+
+**Claude Actions:**
+- Added `lastClassification` property initialized to 'observer'
+- Updated `initializeForm()` to use `this.lastClassification` instead of hardcoded 'observer'
+- Updated `addAssignment()` to save the classification value to `lastClassification` (duty was already being saved to `lastDuty`)
+- Now both duty and classification default to the values from the previous check-in
+
+---
+
 ## Future Interactions
 
 *(New interactions will be appended below)*
