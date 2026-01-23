@@ -4,6 +4,8 @@ Visit https://anet-b84b5.web.app and login with your gmail address.  For now, yo
 
 [Here is a a demo of the application as of 12/6/2025](https://youtu.be/f__79srMfCM).
 
+[Fast run through video on 22 January 2026](https://www.youtube.com/live/nkS7Bhu-8jw)
+
 Here's a screen grab of the app running in both firefox and chrome.
 
 ![img.png](img.png)
