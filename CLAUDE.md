@@ -48,3 +48,8 @@ Try to stick with these media breakpoints since they are bootstrap standards if 
 
 # Icons
 - This project uses all Font Awesome icons and no bootstrap icons
+
+# Documentation
+- Always document all Claude interactions in CLAUDE_INTERACTIONS.md
+- Each interaction should include: user prompt summary, Claude actions taken, and files modified
+- Update the interactions log after completing each task

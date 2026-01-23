@@ -286,6 +286,196 @@ In both `/ncs-net-assignments` and `/ncs-view2` routes add a CSV download button
 
 ---
 
+## Session: 2026-01-22
+
+### Interaction 22: Create Settings Route with Groups CRUD
+**User Prompt:**
+Add a `/settings` route under the hamburger menu. One of the things on this page will be a table for doing CRUD on named groups. A group has name, description, and internal unique ID. No duplicate group names are allowed. When a person starts to edit the name of an existing group the error message won't be shown until they move out of that field. There should be a separate area on the page for adding and removing users from a group.
+
+**Claude Actions:**
+- Created `src/app/_models/ncs-settings.model.ts` with interfaces:
+  - `Group` (id, name, description)
+  - `GroupMember` (id, groupId, email)
+  - `EditableGroup` extends Group with isNew flag
+  - `AppUser` (id, email, displayName, photoURL, lastLogin)
+- Created `src/app/ncs-settings/ncs-settings.ts` component with:
+  - Groups table with inline editing and auto-save
+  - Add row at top for new groups
+  - Duplicate name validation
+  - Group members management panel
+  - Add/remove members by email
+- Created `src/app/ncs-settings/ncs-settings.html` with two-column layout (groups | members)
+- Created `src/app/ncs-settings/ncs-settings.css` with responsive styling
+- Added to `firebase.service.ts`:
+  - `getGroups()`, `addGroup()`, `updateGroup()`, `deleteGroup()`, `deleteGroupWithMembers()`
+  - `getGroupMembers()`, `addGroupMember()`, `deleteGroupMember()`
+- Added route `/ncs-settings` in `app.routes.ts`
+- Added "Settings" menu item in `app.ts`
+
+---
+
+### Interaction 23: Track Users on Login with Autocomplete
+**User Prompt:**
+Make everyone who logs in a user and put their information into the users document. Now when assigning users to a group a person can pick from users that are already known or type in a name.
+
+**Claude Actions:**
+- Updated `auth.service.ts`:
+  - Added `saveUserToDatabase()` method called on auth state change
+  - Saves user email, displayName, photoURL, and lastLogin timestamp
+- Added to `firebase.service.ts`:
+  - `getUsers()` - Observable to get all known users
+  - `saveUser()` - Save/update user document (keyed by sanitized email)
+  - `getUserByEmail()` - Fetch single user by email
+- Updated `ncs-settings.ts`:
+  - Added `knownUsers` and `filteredUsers` arrays
+  - Added `loadUsers()` and `filterUsers()` methods
+  - Added MatAutocomplete for member email input
+  - Filter excludes users already in the group
+- Updated `ncs-settings.html` with `mat-autocomplete` showing email and displayName
+
+---
+
+### Interaction 24: Implement Group-Based Permission System
+**User Prompt:**
+Always treat user `matt.n3pay@gmail.com` as a member of the group `DCARES`. If a user is not in the group DCARES they are not allowed to use the `/settings` route. In order to edit the net in `/ncs-net-assignments` or `/ncs-view2` the user must be in the same group as the user who created the net. A new user is not put in any groups by default. If one is not in any group they cannot access `/ncs-select-net`.
+
+**Claude Actions:**
+- Created `src/app/_services/permission.service.ts`:
+  - `SUPER_USER_EMAIL = 'matt.n3pay@gmail.com'`
+  - `ADMIN_GROUP_NAME = 'DCARES'`
+  - `getUserGroupsOnce()` - Get user's group names
+  - `isInGroupOnce()` - Check if user is in specific group
+  - `isAdminOnce()` - Check if user is DCARES member
+  - `canAccessNet()` - Check if user can access a specific NET
+- Created `src/app/_guards/settings.guard.ts` - Only DCARES can access settings
+- Created `src/app/_guards/group-member.guard.ts` - Requires any group membership
+- Created `src/app/_guards/net-access.guard.ts` - Requires same group as NET creator
+- Updated `firebase.service.ts`:
+  - Modified `createNet()` to include `creatorEmail` and `creatorGroup`
+  - Modified `getNets()` to return creator info
+  - Added `getNetOnce()` for permission checks
+- Updated `app.routes.ts` with guards:
+  - `/ncs-select-net` uses `groupMemberGuard`
+  - `/ncs-net-assignments` uses `netAccessGuard`
+  - `/ncs-view2` uses `netAccessGuard`
+  - `/ncs-settings` uses `settingsGuard`
+- Updated `app.ts`:
+  - Added `isAdmin` property and `checkAdminStatus()`
+  - Added `shouldShowMenuItem()` to hide Settings for non-DCARES users
+- Updated `ncs-select-net.ts`:
+  - Filters NETs to show only accessible ones
+  - Group selection dropdown when creating new NET
+  - Warning for no group membership or no NET access
+
+---
+
+### Interaction 25: People Page Permissions
+**User Prompt:**
+You must be in a group to access the people page. And you must be in the DCARES group to add people to the page.
+
+**Claude Actions:**
+- Updated `app.routes.ts`: `/ncs-people` uses `groupMemberGuard`
+- Updated `ncs-people.ts`:
+  - Added `PermissionService` injection
+  - Added `isAdmin` property set via `permissionService.isAdminOnce()`
+  - Modified `updateDataSource()` to only include add row for admins
+  - Modified inputs to be readonly for non-admins
+- Updated `ncs-people.html`:
+  - Conditional rendering of add button based on `isAdmin`
+  - Action menu only shown for admins
+
+---
+
+### Interaction 26: Create User Manual
+**User Prompt:**
+Create a user-manual.md file that explains the application. Particularly the rules around what a user can do.
+
+**Claude Actions:**
+- Created `user-manual.md` documenting:
+  - Application overview
+  - Getting started (login, first-time users)
+  - User roles and permissions
+  - Special group (DCARES) and special user (matt.n3pay@gmail.com)
+  - Permission summary table by feature
+  - Feature descriptions (Select NET, NET Assignments, View 2, People, Locations, Duties, Settings)
+  - Understanding access denied messages
+  - Offline support
+  - Troubleshooting section
+
+---
+
+### Interaction 27: Create Profile Page
+**User Prompt:**
+When a user clicks on their name in the upper right the drop down menu should contain a profile route. In the `/profile` page one should be able to edit their name & callsign and see what groups they belong to.
+
+**Claude Actions:**
+- Created `src/app/ncs-profile/ncs-profile.ts` component:
+  - Loads user data from Firebase
+  - Editable fields: customName (display name override), callsign
+  - Shows group memberships as Material chips
+  - Save functionality with success/error feedback
+- Created `src/app/ncs-profile/ncs-profile.html`:
+  - Form with display name and callsign inputs
+  - Group memberships section with chips
+  - Save button with loading state
+- Created `src/app/ncs-profile/ncs-profile.css` with card-based layout
+- Added `updateUserProfile()` to `firebase.service.ts`
+- Updated `AppUser` interface to include `callsign` and `customName` fields
+- Added route `/ncs-profile` with `authGuard` in `app.routes.ts`
+- Updated `ncs-top-bar.html` to add Profile menu item in user dropdown
+
+---
+
+### Interaction 28: Fix Select NET Menu Bug
+**User Prompt:**
+Fix the bug where `Select NET` is not shown in the hamburger menu.
+
+**Claude Actions:**
+- Diagnosed issue: Sidenav content started at y=0 while main container had `padding-top: 64px` for toolbar
+- Previous workaround had duplicated the first menu item (incorrect fix)
+- Removed duplicate "Select NET" entry from `app.ts` menuItems array
+- Updated `app.css`:
+  - Added `padding-top: 64px` to `.sidenav` class
+  - Added media query for mobile: `padding-top: 56px` at `max-width: 576px`
+- This ensures sidenav content starts below the fixed toolbar
+
+---
+
+### Interaction 29: Add Data Backup Feature
+**User Prompt:**
+In the `/ncs-settings` page, when one is in the `DCARES` group there should be an option to download a backup as a zip file. All of the documents in the Firebase database should be available in the zip file. There should be a dropdown for CSV or JSON format.
+
+**Claude Actions:**
+- Added `jszip` library: `npm install jszip`
+- Added to `firebase.service.ts`:
+  - `getAllDataForBackup()` method that fetches all collections (nets, people, groups, groupMembers, users, duties, locations)
+- Updated `ncs-settings.ts`:
+  - Added backup properties: `backupFormat`, `isBackingUp`, `backupError`
+  - Added `downloadBackup()` async method using JSZip
+  - Added `convertToCSV()` and `escapeCSV()` helper methods
+  - Imports JSZip library
+- Updated `ncs-settings.html`:
+  - Added "Data Backup" section card
+  - Format dropdown (JSON/CSV)
+  - Download button with loading spinner
+  - Info box explaining format differences
+- Updated `ncs-settings.css`:
+  - Added styles for backup section (.backup-description, .backup-controls, .format-select, .button-spinner, .backup-info)
+- JSON backup: One file per collection
+- CSV backup: One file per collection + separate files for each NET's entries
+- Download as timestamped ZIP file
+
+---
+
+### Interaction 30: Update CLAUDE_INTERACTIONS.md
+**User Prompt:**
+Hey, you are not updating the CLAUDE_INTERACTIONS.md file. Please catchup and add all of the stuff from the last 18 hours.
+
+**Claude Actions:**
+- Updated this file (CLAUDE_INTERACTIONS.md) with Interactions 22-30 covering all changes from the session
+
+---
+
 ## Future Interactions
 
 *(New interactions will be appended below)*
