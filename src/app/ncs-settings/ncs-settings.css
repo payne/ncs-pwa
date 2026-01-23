@@ -282,6 +282,79 @@ table {
   margin-bottom: 0;
 }
 
+.danger-section {
+  border: 2px solid var(--color-danger, #dc3545);
+}
+
+.danger-header {
+  color: var(--color-danger, #dc3545);
+}
+
+.reset-description {
+  color: #6c757d;
+  margin-bottom: 1rem;
+}
+
+.reset-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background-color: rgba(255, 193, 7, 0.15);
+  border: 1px solid #ffc107;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  color: #856404;
+}
+
+.reset-warning mat-icon {
+  color: #ffc107;
+}
+
+.reset-controls {
+  margin-bottom: 1rem;
+}
+
+.reset-confirm {
+  padding: 1rem;
+  background-color: rgba(220, 53, 69, 0.1);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.confirm-message {
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  color: var(--color-danger, #dc3545);
+}
+
+.reset-list {
+  margin: 0 0 1rem 0;
+  padding-left: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.reset-list li {
+  margin-bottom: 0.25rem;
+}
+
+.confirm-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.reset-info {
+  padding: 1rem;
+  background-color: var(--color-light);
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.reset-info p {
+  margin: 0;
+}
+
 @media (min-width: 576px) {
   .filter-input {
     width: 180px;

@@ -424,4 +424,70 @@ export class FirebaseService {
       footerInfo: ''
     };
   }
+
+  // Reset all data and initialize with defaults
+  async resetAllData(): Promise<void> {
+    const ADMIN_EMAIL = 'matt.n3pay@gmail.com';
+    const ADMIN_GROUP_NAME = 'DCARES';
+
+    // Delete all collections
+    await Promise.all([
+      remove(ref(this.db, 'nets')),
+      remove(ref(this.db, 'people')),
+      remove(ref(this.db, 'groups')),
+      remove(ref(this.db, 'groupMembers')),
+      remove(ref(this.db, 'users')),
+      remove(ref(this.db, 'duties')),
+      remove(ref(this.db, 'locations'))
+    ]);
+
+    // Initialize users with admin user
+    const sanitizedEmail = ADMIN_EMAIL.replace(/\./g, ',');
+    await set(ref(this.db, `users/${sanitizedEmail}`), {
+      email: ADMIN_EMAIL,
+      displayName: 'Matt Payne',
+      photoURL: '',
+      lastLogin: Date.now()
+    });
+
+    // Initialize groups with DCARES
+    const groupsRef = ref(this.db, 'groups');
+    const newGroupRef = push(groupsRef);
+    const groupId = newGroupRef.key || '';
+    await set(newGroupRef, {
+      name: ADMIN_GROUP_NAME,
+      description: 'Douglas County ARES'
+    });
+
+    // Initialize groupMembers with admin in DCARES
+    const membersRef = ref(this.db, 'groupMembers');
+    const newMemberRef = push(membersRef);
+    await set(newMemberRef, {
+      groupId: groupId,
+      email: ADMIN_EMAIL
+    });
+
+    // Fetch and initialize people from members.json
+    try {
+      const response = await fetch('/members.json');
+      const members: Operator[] = await response.json();
+
+      const peopleRef = ref(this.db, 'people');
+      for (const member of members) {
+        const newPersonRef = push(peopleRef);
+        await set(newPersonRef, {
+          name: member.name,
+          callsign: member.callsign,
+          clubs: member.clubs || []
+        });
+      }
+    } catch (error) {
+      console.error('Error loading members.json:', error);
+      throw new Error('Failed to load members.json for initialization');
+    }
+
+    // Clear the current net selection
+    this.currentNetId = '';
+    localStorage.removeItem('currentNetId');
+  }
 }

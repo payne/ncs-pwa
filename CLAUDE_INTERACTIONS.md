@@ -504,6 +504,36 @@ Right now any logged in user can both read and write a NET. Change things so tha
 
 ---
 
+### Interaction 32: Add Reset Data Button
+**User Prompt:**
+Create a button in the `/ncs-settings` page that deletes all the data in firebase. The users document is initialized with just `matt.n3pay@gmail.com`; groups document is initialized with just `DCARES`; groupMembers is initialized so that `matt.n3pay@gmail.com` is a member of `DCARES`; the people document is initialized with the contents of the `members.json` file in the source code.
+
+**Claude Actions:**
+- Added `resetAllData()` method to `firebase.service.ts`:
+  - Deletes all collections (nets, people, groups, groupMembers, users, duties, locations)
+  - Creates user entry for matt.n3pay@gmail.com
+  - Creates DCARES group
+  - Links matt.n3pay@gmail.com to DCARES in groupMembers
+  - Fetches members.json and populates people collection
+  - Clears current NET selection from localStorage
+- Updated `ncs-settings.ts`:
+  - Added reset state properties (isResetting, resetError, showResetConfirm)
+  - Added `toggleResetConfirm()` method
+  - Added `resetAllData()` method that calls the service and reloads the page
+- Updated `ncs-settings.html`:
+  - Added "Reset Data" section with danger styling
+  - Added warning message about irreversible action
+  - Added two-step confirmation (click button, then confirm)
+  - Shows spinner during reset operation
+  - Lists what will be deleted and restored
+- Updated `ncs-settings.css`:
+  - Added danger-section and danger-header styles
+  - Added reset-warning, reset-controls, reset-confirm styles
+  - Added reset-list and confirm-buttons styles
+- Updated `user-manual.md` with Data Reset documentation
+
+---
+
 ## Future Interactions
 
 *(New interactions will be appended below)*

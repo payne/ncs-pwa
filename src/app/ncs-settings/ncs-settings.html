@@ -202,4 +202,62 @@
       </div>
     </div>
   </div>
+
+  <!-- Reset Data Section -->
+  <div class="row">
+    <div class="col-12">
+      <div class="section-card danger-section">
+        <div class="section-header">
+          <h2 class="danger-header">Reset Data</h2>
+        </div>
+
+        <p class="reset-description">
+          Delete all data and reset to initial state. This will remove all NETs, entries, people, groups, users, duties, and locations.
+        </p>
+
+        <div class="reset-warning">
+          <mat-icon>warning</mat-icon>
+          <span>This action cannot be undone. Make sure to download a backup first.</span>
+        </div>
+
+        <div class="reset-controls" *ngIf="!showResetConfirm">
+          <button mat-raised-button color="warn" (click)="toggleResetConfirm()">
+            <mat-icon>delete_forever</mat-icon>
+            Reset All Data
+          </button>
+        </div>
+
+        <div class="reset-confirm" *ngIf="showResetConfirm">
+          <p class="confirm-message">Are you sure you want to delete ALL data? This will:</p>
+          <ul class="reset-list">
+            <li>Delete all NETs and their entries</li>
+            <li>Delete all people (then restore from members.json)</li>
+            <li>Delete all groups (then create DCARES)</li>
+            <li>Delete all users (then add matt.n3pay&#64;gmail.com)</li>
+            <li>Delete all duties and locations</li>
+          </ul>
+
+          <div class="confirm-buttons">
+            <button mat-raised-button (click)="toggleResetConfirm()">
+              Cancel
+            </button>
+            <button mat-raised-button color="warn" (click)="resetAllData()" [disabled]="isResetting">
+              <mat-spinner *ngIf="isResetting" diameter="20" class="button-spinner"></mat-spinner>
+              <mat-icon *ngIf="!isResetting">delete_forever</mat-icon>
+              {{ isResetting ? 'Resetting...' : 'Yes, Delete Everything' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="error-message" *ngIf="resetError">
+          <mat-icon>error</mat-icon>
+          {{ resetError }}
+        </div>
+
+        <div class="reset-info">
+          <p><strong>After reset:</strong> Users = matt.n3pay&#64;gmail.com | Groups = DCARES | People = members.json</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

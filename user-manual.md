@@ -255,6 +255,23 @@ DCARES administrators can download a complete backup of all application data.
 - Duties
 - Locations
 
+#### Data Reset
+
+DCARES administrators can reset all application data to its initial state.
+
+1. **Click "Reset All Data"** button in the danger zone section
+2. **Review the warning** - this action cannot be undone
+3. **Confirm the reset** by clicking "Yes, Delete Everything"
+
+**After reset, the database will contain:**
+- **Users:** Only matt.n3pay@gmail.com
+- **Groups:** Only DCARES
+- **Group Members:** matt.n3pay@gmail.com in DCARES
+- **People:** Restored from members.json file
+- **NETs, Duties, Locations:** Empty
+
+**Important:** Always download a backup before resetting data.
+
 ---
 
 ### About

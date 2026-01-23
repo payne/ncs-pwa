@@ -62,6 +62,11 @@ export class NcsSettings implements OnInit {
   isBackingUp: boolean = false;
   backupError: string = '';
 
+  // Reset
+  isResetting: boolean = false;
+  resetError: string = '';
+  showResetConfirm: boolean = false;
+
   @ViewChild('groupSort') groupSort!: MatSort;
 
   constructor(private firebaseService: FirebaseService) {}
@@ -414,5 +419,29 @@ export class NcsSettings implements OnInit {
       return `"${value.replace(/"/g, '""')}"`;
     }
     return value;
+  }
+
+  // --- Reset Data ---
+
+  toggleResetConfirm(): void {
+    this.showResetConfirm = !this.showResetConfirm;
+    this.resetError = '';
+  }
+
+  async resetAllData(): Promise<void> {
+    this.isResetting = true;
+    this.resetError = '';
+
+    try {
+      await this.firebaseService.resetAllData();
+      this.showResetConfirm = false;
+      // Reload the page to refresh all data
+      window.location.reload();
+    } catch (error) {
+      console.error('Error resetting data:', error);
+      this.resetError = 'Failed to reset data. Please try again.';
+    } finally {
+      this.isResetting = false;
+    }
   }
 }
