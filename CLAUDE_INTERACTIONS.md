@@ -476,6 +476,34 @@ Hey, you are not updating the CLAUDE_INTERACTIONS.md file. Please catchup and ad
 
 ---
 
+### Interaction 31: Restrict Write Operations on NETs
+**User Prompt:**
+Right now any logged in user can both read and write a NET. Change things so that a user only has create, update, and delete privileges for NETs where they are in the same group as the user that created the NET.
+
+**Claude Actions:**
+- Updated `ncs-net-assignments.ts`:
+  - Added `PermissionService` import and injection
+  - Added `canEdit` property to track edit permissions
+  - Modified `selectNet()` to be async and check `permissionService.canAccessNet()`
+  - Added `updateDataSource()` method to conditionally include add row based on `canEdit`
+- Updated `ncs-net-assignments.html`:
+  - Added "(Read Only)" badge in header when `canEdit` is false
+  - Made add button conditional on `canEdit`
+  - Made action menu (edit, delete, checkout) conditional on `canEdit`
+- Updated `ncs-net-assignments.css`:
+  - Added `.read-only-badge` styling
+- Updated `ncs-view2.ts`:
+  - Same changes as ncs-net-assignments for permission checking
+- Updated `ncs-view2.html`:
+  - Added "(Read Only)" badge and conditional action buttons
+- Updated `ncs-view2.css`:
+  - Added `.read-only-badge` styling
+- Updated `user-manual.md`:
+  - Clarified read-only vs edit permissions for NET Assignments and View 2
+  - Updated permission summary table
+
+---
+
 ## Future Interactions
 
 *(New interactions will be appended below)*

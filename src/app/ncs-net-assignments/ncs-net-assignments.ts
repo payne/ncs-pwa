@@ -16,6 +16,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { OperatorService } from '../_services/operator.service';
 import { StorageService } from '../_services/storage.service';
 import { FirebaseService } from '../_services/firebase.service';
+import { PermissionService } from '../_services/permission.service';
 import { NetEntry } from '../_models/net-entry.model';
 import { Operator } from '../_models/operator.model';
 
@@ -67,6 +68,7 @@ export class NcsNetAssignments implements OnInit {
   currentNetId: string = '';
   currentNetName: string = '';
   addRowPlaceholder: any = { isAddRow: true };
+  canEdit: boolean = false;
 
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -75,6 +77,7 @@ export class NcsNetAssignments implements OnInit {
     private operatorService: OperatorService,
     private storageService: StorageService,
     private firebaseService: FirebaseService,
+    private permissionService: PermissionService,
     private router: Router,
     private cdr: ChangeDetectorRef,
     private elementRef: ElementRef
@@ -152,10 +155,13 @@ export class NcsNetAssignments implements OnInit {
     }
   }
 
-  selectNet(netId: string): void {
+  async selectNet(netId: string): Promise<void> {
     this.currentNetId = netId;
     this.firebaseService.setCurrentNet(netId);
     localStorage.setItem('currentNetId', netId);
+
+    // Check if user can edit this NET
+    this.canEdit = await this.permissionService.canAccessNet(netId);
 
     this.firebaseService.getNets().subscribe({
       next: (nets) => {
@@ -169,7 +175,7 @@ export class NcsNetAssignments implements OnInit {
     this.firebaseService.getEntries(netId).subscribe({
       next: (entries) => {
         this.entries = entries;
-        this.dataSource.data = [this.addRowPlaceholder, ...this.entries];
+        this.updateDataSource();
       },
       error: (error) => {
         console.error('Error loading entries:', error);
@@ -177,9 +183,17 @@ export class NcsNetAssignments implements OnInit {
     });
   }
 
+  private updateDataSource(): void {
+    if (this.canEdit) {
+      this.dataSource.data = [this.addRowPlaceholder, ...this.entries];
+    } else {
+      this.dataSource.data = [...this.entries];
+    }
+  }
+
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
-    this.dataSource.data = [this.addRowPlaceholder, ...this.entries];
+    this.updateDataSource();
 
     if (this.sort) {
       this.sort.active = 'timeIn';

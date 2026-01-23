@@ -53,9 +53,10 @@ The user `matt.n3pay@gmail.com` is automatically treated as a member of the DCAR
 | Login | Google account |
 | Profile | Must be logged in |
 | Select NET | Must be in at least one group |
-| View NETs | Must be in the same group as NET creator (or DCARES) |
+| View NETs in list | Must be in the same group as NET creator (or DCARES) |
 | Create NET | Must be in at least one group |
-| Edit NET Assignments | Must be in the same group as NET creator (or DCARES) |
+| View NET Assignments (read-only) | Any logged-in user can view NETs they can access |
+| Edit NET Assignments (add/edit/delete) | Must be in the same group as NET creator (or DCARES) |
 | View People | Must be in at least one group |
 | Add/Edit/Delete People | Must be in DCARES group |
 | View Locations | Must be logged in |
@@ -102,8 +103,10 @@ The user `matt.n3pay@gmail.com` is automatically treated as a member of the DCAR
 3. Record time in/out, duties, mileage, and other information
 
 **Permissions:**
-- You must be in the same group as the NET creator to access
-- DCARES members can access any NET
+- **View (read-only):** Any user who can access the NET can view its assignments
+- **Edit (add/edit/delete):** Must be in the same group as the NET creator (or DCARES)
+- If you don't have edit permission, the page displays "(Read Only)" in the header
+- The add row and action buttons are hidden in read-only mode
 
 ---
 
@@ -114,7 +117,10 @@ The user `matt.n3pay@gmail.com` is automatically treated as a member of the DCAR
 **Purpose:** Alternative view for NET data with additional fields.
 
 **Permissions:**
-- Same as NET Assignments - must be in the same group as the NET creator
+- Same as NET Assignments:
+  - **View (read-only):** Any user who can access the NET
+  - **Edit (add/edit/delete):** Must be in the same group as the NET creator (or DCARES)
+- Read-only mode displays "(Read Only)" in the header
 
 ---
 

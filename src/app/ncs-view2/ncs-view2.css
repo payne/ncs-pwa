@@ -199,6 +199,16 @@ table {
   font-size: 0.8rem;
 }
 
+.read-only-badge {
+  font-size: 0.75rem;
+  color: #6c757d;
+  background-color: #e9ecef;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+  font-weight: 400;
+}
+
 @media (min-width: 576px) {
   .filter-input {
     width: 180px;
