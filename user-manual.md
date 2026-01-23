@@ -227,6 +227,28 @@ For non-DCARES users, the People page is read-only.
 3. **Remove a Member:**
    - Click the remove icon next to the member's email
 
+#### Data Backup
+
+DCARES administrators can download a complete backup of all application data.
+
+1. **Choose Format:**
+   - **JSON:** Best for data restoration or programmatic use. Preserves all data types and nested structures.
+   - **CSV:** Best for viewing in spreadsheet applications (Excel, Google Sheets). Each data collection is saved as a separate file.
+
+2. **Download Backup:**
+   - Select your preferred format from the dropdown
+   - Click "Download Backup"
+   - A ZIP file will be downloaded containing all data files
+
+**Backup includes:**
+- NETs (including all entries for each NET)
+- People directory
+- Groups
+- Group memberships
+- Users
+- Duties
+- Locations
+
 ---
 
 ### About

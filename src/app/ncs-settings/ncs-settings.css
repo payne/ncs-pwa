@@ -241,6 +241,47 @@ table {
   color: #6c757d;
 }
 
+.backup-description {
+  color: #6c757d;
+  margin-bottom: 1rem;
+}
+
+.backup-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.format-select {
+  width: 150px;
+}
+
+.button-spinner {
+  display: inline-block;
+  margin-right: 8px;
+}
+
+:host ::ng-deep .button-spinner circle {
+  stroke: white;
+}
+
+.backup-info {
+  padding: 1rem;
+  background-color: var(--color-light);
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.backup-info p {
+  margin: 0 0 0.5rem 0;
+}
+
+.backup-info p:last-child {
+  margin-bottom: 0;
+}
+
 @media (min-width: 576px) {
   .filter-input {
     width: 180px;

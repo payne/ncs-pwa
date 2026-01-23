@@ -359,6 +359,46 @@ export class FirebaseService {
     return update(userRef, updateData);
   }
 
+  // Backup method - fetch all data for backup
+  async getAllDataForBackup(): Promise<{
+    nets: any[];
+    people: any[];
+    groups: any[];
+    groupMembers: any[];
+    users: any[];
+    duties: any[];
+    locations: any[];
+  }> {
+    const [netsSnapshot, peopleSnapshot, groupsSnapshot, groupMembersSnapshot, usersSnapshot, dutiesSnapshot, locationsSnapshot] = await Promise.all([
+      get(ref(this.db, 'nets')),
+      get(ref(this.db, 'people')),
+      get(ref(this.db, 'groups')),
+      get(ref(this.db, 'groupMembers')),
+      get(ref(this.db, 'users')),
+      get(ref(this.db, 'duties')),
+      get(ref(this.db, 'locations'))
+    ]);
+
+    const transformData = (snapshot: any) => {
+      const data = snapshot.val();
+      if (!data) return [];
+      return Object.keys(data).map(key => ({
+        id: key,
+        ...data[key]
+      }));
+    };
+
+    return {
+      nets: transformData(netsSnapshot),
+      people: transformData(peopleSnapshot),
+      groups: transformData(groupsSnapshot),
+      groupMembers: transformData(groupMembersSnapshot),
+      users: transformData(usersSnapshot),
+      duties: transformData(dutiesSnapshot),
+      locations: transformData(locationsSnapshot)
+    };
+  }
+
   private getDefaultEntry(): NetEntry {
     return {
       id: '',
