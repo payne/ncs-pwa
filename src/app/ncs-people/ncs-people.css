@@ -112,6 +112,21 @@ table {
   background-color: white;
 }
 
+.readonly-input {
+  cursor: default;
+  color: #495057;
+}
+
+.readonly-input:hover {
+  border-color: transparent;
+}
+
+.readonly-input:focus {
+  border-color: transparent;
+  box-shadow: none;
+  background-color: transparent;
+}
+
 @media (min-width: 576px) {
   .filter-input {
     width: 180px;

@@ -10,6 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { FirebaseService } from '../_services/firebase.service';
+import { PermissionService } from '../_services/permission.service';
 import { Operator } from '../_models/operator.model';
 
 interface EditablePerson extends Operator {
@@ -38,14 +39,24 @@ export class NcsPeople implements OnInit {
   dataSource!: MatTableDataSource<EditablePerson>;
   people: EditablePerson[] = [];
   addRowPlaceholder: EditablePerson = { isNew: true, callsign: '', name: '', clubs: [] };
+  isAdmin = false;
 
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private firebaseService: FirebaseService) {}
+  constructor(
+    private firebaseService: FirebaseService,
+    private permissionService: PermissionService
+  ) {}
 
   ngOnInit(): void {
-    this.dataSource = new MatTableDataSource<EditablePerson>([this.addRowPlaceholder]);
+    this.dataSource = new MatTableDataSource<EditablePerson>([]);
+    this.checkAdminStatus();
     this.loadPeople();
+  }
+
+  async checkAdminStatus(): Promise<void> {
+    this.isAdmin = await this.permissionService.isAdminOnce();
+    this.updateDataSource();
   }
 
   ngAfterViewInit(): void {
@@ -56,7 +67,7 @@ export class NcsPeople implements OnInit {
     this.firebaseService.getPeople().subscribe({
       next: (people) => {
         this.people = people;
-        this.dataSource.data = [this.addRowPlaceholder, ...this.people];
+        this.updateDataSource();
         if (this.sort) {
           this.dataSource.sort = this.sort;
         }
@@ -65,6 +76,14 @@ export class NcsPeople implements OnInit {
         console.error('Error loading people:', error);
       }
     });
+  }
+
+  updateDataSource(): void {
+    if (this.isAdmin) {
+      this.dataSource.data = [this.addRowPlaceholder, ...this.people];
+    } else {
+      this.dataSource.data = [...this.people];
+    }
   }
 
   configureSorting(): void {

@@ -17,11 +17,13 @@
       <ng-container matColumnDef="callsign">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Callsign</th>
         <td mat-cell *matCellDef="let person">
-          <ng-container *ngIf="person.isNew">
+          <ng-container *ngIf="person.isNew && isAdmin">
             <input class="cell-input" [(ngModel)]="addRowPlaceholder.callsign" placeholder="Callsign">
           </ng-container>
           <ng-container *ngIf="!person.isNew">
             <input class="cell-input" [value]="person.callsign"
+                   [readonly]="!isAdmin"
+                   [class.readonly-input]="!isAdmin"
                    (blur)="onCellBlur(person, 'callsign', $any($event.target).value)">
           </ng-container>
         </td>
@@ -31,11 +33,13 @@
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
         <td mat-cell *matCellDef="let person">
-          <ng-container *ngIf="person.isNew">
+          <ng-container *ngIf="person.isNew && isAdmin">
             <input class="cell-input" [(ngModel)]="addRowPlaceholder.name" placeholder="Name">
           </ng-container>
           <ng-container *ngIf="!person.isNew">
             <input class="cell-input" [value]="person.name"
+                   [readonly]="!isAdmin"
+                   [class.readonly-input]="!isAdmin"
                    (blur)="onCellBlur(person, 'name', $any($event.target).value)">
           </ng-container>
         </td>
@@ -45,13 +49,15 @@
       <ng-container matColumnDef="clubs">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Clubs</th>
         <td mat-cell *matCellDef="let person">
-          <ng-container *ngIf="person.isNew">
+          <ng-container *ngIf="person.isNew && isAdmin">
             <input class="cell-input" [value]="getClubsString(addRowPlaceholder.clubs)"
                    (blur)="onAddRowClubsBlur($any($event.target).value)"
                    placeholder="CLUB1, CLUB2">
           </ng-container>
           <ng-container *ngIf="!person.isNew">
             <input class="cell-input" [value]="getClubsString(person.clubs)"
+                   [readonly]="!isAdmin"
+                   [class.readonly-input]="!isAdmin"
                    (blur)="onClubsBlur(person, $any($event.target).value)">
           </ng-container>
         </td>
@@ -61,12 +67,12 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef class="actions-header"></th>
         <td mat-cell *matCellDef="let person" class="actions-cell">
-          <ng-container *ngIf="person.isNew">
+          <ng-container *ngIf="person.isNew && isAdmin">
             <button mat-icon-button color="primary" (click)="addPerson()" matTooltip="Add">
               <mat-icon>add</mat-icon>
             </button>
           </ng-container>
-          <ng-container *ngIf="!person.isNew">
+          <ng-container *ngIf="!person.isNew && isAdmin">
             <button mat-icon-button [matMenuTriggerFor]="actionMenu" class="action-menu-btn">
               <mat-icon>more_vert</mat-icon>
             </button>

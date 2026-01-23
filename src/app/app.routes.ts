@@ -19,7 +19,7 @@ export const routes: Routes = [
   { path: 'ncs-select-net', component: NcsSelectNet, canActivate: [groupMemberGuard] },
   { path: 'ncs-net-assignments', component: NcsNetAssignments, canActivate: [netAccessGuard] },
   { path: 'ncs-view2', component: NcsView2, canActivate: [netAccessGuard] },
-  { path: 'ncs-people', component: NcsPeople, canActivate: [authGuard] },
+  { path: 'ncs-people', component: NcsPeople, canActivate: [groupMemberGuard] },
   { path: 'ncs-locations', component: NcsLocations, canActivate: [authGuard] },
   { path: 'ncs-duties', component: NcsDuties, canActivate: [authGuard] },
   { path: 'ncs-settings', component: NcsSettings, canActivate: [settingsGuard] },
