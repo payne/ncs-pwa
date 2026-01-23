@@ -21,6 +21,10 @@
       <div class="user-info">
         <p class="user-name">{{ userDisplayName }}</p>
       </div>
+      <button mat-menu-item routerLink="/ncs-profile">
+        <mat-icon>person</mat-icon>
+        <span>Profile</span>
+      </button>
       <button mat-menu-item (click)="signOut()">
         <mat-icon>logout</mat-icon>
         <span>Sign Out</span>

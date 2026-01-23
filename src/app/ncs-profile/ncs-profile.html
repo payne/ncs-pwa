@@ -1,0 +1,81 @@
+<div class="container-fluid">
+  <h1>Profile</h1>
+
+  <div class="profile-container">
+    <!-- User Info Card -->
+    <div class="profile-card">
+      <div class="profile-header">
+        <img [src]="userPhotoURL" *ngIf="userPhotoURL" class="profile-avatar" [alt]="getDisplayName()">
+        <mat-icon *ngIf="!userPhotoURL" class="profile-avatar-icon">account_circle</mat-icon>
+        <div class="profile-header-info">
+          <h2>{{ getDisplayName() }}</h2>
+          <p class="email">{{ userEmail }}</p>
+        </div>
+      </div>
+
+      <div class="profile-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Display Name</mat-label>
+          <input matInput [(ngModel)]="customName" [placeholder]="googleDisplayName || 'Enter your name'">
+          <mat-hint>Leave blank to use your Google account name</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Callsign</mat-label>
+          <input matInput [(ngModel)]="callsign" placeholder="e.g., W3ABC" style="text-transform: uppercase;">
+          <mat-hint>Your amateur radio callsign</mat-hint>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-raised-button color="primary" (click)="saveProfile()" [disabled]="isSaving">
+            <mat-icon>save</mat-icon>
+            {{ isSaving ? 'Saving...' : 'Save Profile' }}
+          </button>
+        </div>
+
+        <div class="save-message success" *ngIf="saveSuccess">
+          <mat-icon>check_circle</mat-icon>
+          Profile saved successfully!
+        </div>
+
+        <div class="save-message error" *ngIf="saveError">
+          <mat-icon>error</mat-icon>
+          {{ saveError }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Groups Card -->
+    <div class="profile-card">
+      <h3>Group Membership</h3>
+
+      <div *ngIf="userGroups.length > 0" class="groups-list">
+        <mat-chip-set>
+          <mat-chip *ngFor="let group of userGroups" highlighted>
+            <mat-icon matChipAvatar>group</mat-icon>
+            {{ group }}
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+
+      <div *ngIf="userGroups.length === 0" class="no-groups">
+        <mat-icon>group_off</mat-icon>
+        <p>You are not a member of any groups.</p>
+        <p class="hint">Contact an administrator to be added to a group.</p>
+      </div>
+    </div>
+
+    <!-- Account Info Card -->
+    <div class="profile-card">
+      <h3>Account Information</h3>
+      <div class="info-row">
+        <span class="info-label">Email:</span>
+        <span class="info-value">{{ userEmail }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Google Name:</span>
+        <span class="info-value">{{ googleDisplayName || 'Not available' }}</span>
+      </div>
+    </div>
+  </div>
+</div>

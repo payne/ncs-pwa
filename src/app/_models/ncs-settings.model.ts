@@ -20,4 +20,6 @@ export interface AppUser {
   displayName: string;
   photoURL: string;
   lastLogin: number;
+  callsign?: string;
+  customName?: string;
 }

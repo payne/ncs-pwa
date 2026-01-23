@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Output, EventEmitter, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,7 +9,7 @@ import { AuthService } from '../../_services/auth.service';
 
 @Component({
   selector: 'app-ncs-top-bar',
-  imports: [CommonModule, MatToolbarModule, MatIconModule, MatButtonModule, MatMenuModule],
+  imports: [CommonModule, RouterLink, MatToolbarModule, MatIconModule, MatButtonModule, MatMenuModule],
   templateUrl: './ncs-top-bar.html',
   styleUrl: './ncs-top-bar.css',
 })

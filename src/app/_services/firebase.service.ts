@@ -324,12 +324,39 @@ export class FirebaseService {
     // Use email as key (sanitized for Firebase path)
     const sanitizedEmail = user.email.replace(/\./g, ',');
     const userRef = ref(this.db, `users/${sanitizedEmail}`);
+
+    // Get existing user data to preserve fields
+    const existingSnapshot = await get(userRef);
+    const existingData = existingSnapshot.val() || {};
+
     return set(userRef, {
+      ...existingData,
       email: user.email,
       displayName: user.displayName,
       photoURL: user.photoURL,
       lastLogin: user.lastLogin
     });
+  }
+
+  async getUserByEmail(email: string): Promise<AppUser | null> {
+    const sanitizedEmail = email.replace(/\./g, ',');
+    const userRef = ref(this.db, `users/${sanitizedEmail}`);
+    const snapshot = await get(userRef);
+    const data = snapshot.val();
+    if (data) {
+      return {
+        ...data,
+        id: sanitizedEmail
+      };
+    }
+    return null;
+  }
+
+  async updateUserProfile(email: string, updates: Partial<AppUser>): Promise<void> {
+    const sanitizedEmail = email.replace(/\./g, ',');
+    const userRef = ref(this.db, `users/${sanitizedEmail}`);
+    const { id, ...updateData } = updates as any;
+    return update(userRef, updateData);
   }
 
   private getDefaultEntry(): NetEntry {

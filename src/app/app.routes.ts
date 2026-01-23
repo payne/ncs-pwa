@@ -8,6 +8,7 @@ import { NcsAbout } from './ncs-about/ncs-about';
 import { NcsLogin } from './ncs-login/ncs-login';
 import { NcsView2 } from './ncs-view2/ncs-view2';
 import { NcsSettings } from './ncs-settings/ncs-settings';
+import { NcsProfile } from './ncs-profile/ncs-profile';
 import { authGuard } from './_guards/auth.guard';
 import { settingsGuard } from './_guards/settings.guard';
 import { groupMemberGuard } from './_guards/group-member.guard';
@@ -23,5 +24,6 @@ export const routes: Routes = [
   { path: 'ncs-locations', component: NcsLocations, canActivate: [authGuard] },
   { path: 'ncs-duties', component: NcsDuties, canActivate: [authGuard] },
   { path: 'ncs-settings', component: NcsSettings, canActivate: [settingsGuard] },
+  { path: 'ncs-profile', component: NcsProfile, canActivate: [authGuard] },
   { path: 'ncs-about', component: NcsAbout, canActivate: [authGuard] }
 ];
