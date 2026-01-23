@@ -5,6 +5,7 @@
 
 .sidenav {
   width: 250px;
+  padding-top: 64px;
 }
 
 .main-content {
@@ -21,6 +22,10 @@
 
 @media (max-width: 576px) {
   .sidenav-container {
+    padding-top: 56px;
+  }
+
+  .sidenav {
     padding-top: 56px;
   }
 
