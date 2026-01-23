@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { getAuth, Auth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, User } from 'firebase/auth';
 import { Observable } from 'rxjs';
+import { FirebaseService } from './firebase.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,12 +10,28 @@ export class AuthService {
   private auth: Auth;
   private currentUser: User | null = null;
 
-  constructor() {
+  constructor(private firebaseService: FirebaseService) {
     this.auth = getAuth();
 
     onAuthStateChanged(this.auth, (user) => {
       this.currentUser = user;
+      if (user) {
+        this.saveUserToDatabase(user);
+      }
     });
+  }
+
+  private saveUserToDatabase(user: User): void {
+    if (user.email) {
+      this.firebaseService.saveUser({
+        email: user.email,
+        displayName: user.displayName || '',
+        photoURL: user.photoURL || '',
+        lastLogin: Date.now()
+      }).catch(error => {
+        console.error('Error saving user to database:', error);
+      });
+    }
   }
 
   getCurrentUser(): User | null {

@@ -113,9 +113,21 @@
           <div class="add-member-form">
             <mat-form-field appearance="outline" class="email-input">
               <mat-label>Email address</mat-label>
-              <input matInput [(ngModel)]="newMemberEmail" placeholder="user@example.com"
-                     (keyup.enter)="addMember()">
+              <input matInput
+                     [(ngModel)]="newMemberEmail"
+                     [matAutocomplete]="userAutocomplete"
+                     (ngModelChange)="onUserInputChange()"
+                     (keyup.enter)="addMember()"
+                     placeholder="Type to search or enter email">
               <mat-icon matSuffix>email</mat-icon>
+              <mat-autocomplete #userAutocomplete="matAutocomplete">
+                <mat-option *ngFor="let user of filteredUsers" [value]="user.email">
+                  <div class="autocomplete-option">
+                    <span class="user-email">{{ user.email }}</span>
+                    <span class="user-name" *ngIf="user.displayName">{{ user.displayName }}</span>
+                  </div>
+                </mat-option>
+              </mat-autocomplete>
             </mat-form-field>
             <button mat-raised-button color="primary" (click)="addMember()">
               <mat-icon>person_add</mat-icon>

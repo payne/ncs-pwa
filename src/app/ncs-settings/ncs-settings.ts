@@ -11,8 +11,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FirebaseService } from '../_services/firebase.service';
-import { Group, GroupMember, EditableGroup } from '../_models/ncs-settings.model';
+import { Group, GroupMember, EditableGroup, AppUser } from '../_models/ncs-settings.model';
 
 @Component({
   selector: 'app-ncs-settings',
@@ -28,7 +29,8 @@ import { Group, GroupMember, EditableGroup } from '../_models/ncs-settings.model
     MatTooltipModule,
     MatMenuModule,
     MatSelectModule,
-    MatChipsModule
+    MatChipsModule,
+    MatAutocompleteModule
   ],
   templateUrl: './ncs-settings.html',
   styleUrl: './ncs-settings.css',
@@ -48,6 +50,10 @@ export class NcsSettings implements OnInit {
   newMemberEmail: string = '';
   memberEmailError: string = '';
 
+  // Known users for autocomplete
+  knownUsers: AppUser[] = [];
+  filteredUsers: AppUser[] = [];
+
   @ViewChild('groupSort') groupSort!: MatSort;
 
   constructor(private firebaseService: FirebaseService) {}
@@ -55,6 +61,35 @@ export class NcsSettings implements OnInit {
   ngOnInit(): void {
     this.groupDataSource = new MatTableDataSource<EditableGroup>([this.addGroupPlaceholder]);
     this.loadGroups();
+    this.loadUsers();
+  }
+
+  loadUsers(): void {
+    this.firebaseService.getUsers().subscribe({
+      next: (users) => {
+        this.knownUsers = users;
+        this.filterUsers();
+      },
+      error: (error) => {
+        console.error('Error loading users:', error);
+      }
+    });
+  }
+
+  filterUsers(): void {
+    const filterValue = this.newMemberEmail?.toLowerCase() || '';
+    // Filter out users already in the group
+    const memberEmails = this.groupMembers.map(m => m.email.toLowerCase());
+    this.filteredUsers = this.knownUsers.filter(user =>
+      !memberEmails.includes(user.email.toLowerCase()) &&
+      (user.email.toLowerCase().includes(filterValue) ||
+       user.displayName.toLowerCase().includes(filterValue))
+    );
+  }
+
+  onUserInputChange(): void {
+    this.filterUsers();
+    this.memberEmailError = '';
   }
 
   ngAfterViewInit(): void {
@@ -196,6 +231,7 @@ export class NcsSettings implements OnInit {
     this.firebaseService.getGroupMembers(this.selectedGroupId).subscribe({
       next: (members) => {
         this.groupMembers = members;
+        this.filterUsers();
       },
       error: (error) => {
         console.error('Error loading group members:', error);
@@ -240,6 +276,7 @@ export class NcsSettings implements OnInit {
 
     this.firebaseService.addGroupMember(newMember).then(() => {
       this.newMemberEmail = '';
+      this.filterUsers();
     }).catch(error => {
       console.error('Error adding member:', error);
     });

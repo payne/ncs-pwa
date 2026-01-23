@@ -13,3 +13,11 @@ export interface GroupMember {
 export interface EditableGroup extends Group {
   isNew?: boolean;
 }
+
+export interface AppUser {
+  id?: string;
+  email: string;
+  displayName: string;
+  photoURL: string;
+  lastLogin: number;
+}

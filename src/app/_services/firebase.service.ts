@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { getDatabase, Database, ref, set, onValue, push, remove, update, off, get } from 'firebase/database';
 import { NetEntry } from '../_models/net-entry.model';
 import { Operator } from '../_models/operator.model';
-import { Group, GroupMember } from '../_models/ncs-settings.model';
+import { Group, GroupMember, AppUser } from '../_models/ncs-settings.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -272,6 +272,44 @@ export class FirebaseService {
   deleteGroupMember(memberId: string): Promise<void> {
     const memberRef = ref(this.db, `groupMembers/${memberId}`);
     return remove(memberRef);
+  }
+
+  // Users collection methods
+  getUsers(): Observable<AppUser[]> {
+    return new Observable(observer => {
+      const usersRef = ref(this.db, 'users');
+
+      const unsubscribe = onValue(usersRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          const users: AppUser[] = Object.keys(data).map(key => ({
+            ...data[key],
+            id: key
+          }));
+          observer.next(users);
+        } else {
+          observer.next([]);
+        }
+      }, (error) => {
+        observer.error(error);
+      });
+
+      return () => {
+        off(usersRef);
+      };
+    });
+  }
+
+  async saveUser(user: AppUser): Promise<void> {
+    // Use email as key (sanitized for Firebase path)
+    const sanitizedEmail = user.email.replace(/\./g, ',');
+    const userRef = ref(this.db, `users/${sanitizedEmail}`);
+    return set(userRef, {
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL,
+      lastLogin: user.lastLogin
+    });
   }
 
   private getDefaultEntry(): NetEntry {
