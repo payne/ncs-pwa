@@ -12,8 +12,10 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FirebaseService } from '../_services/firebase.service';
 import { Group, GroupMember, EditableGroup, AppUser } from '../_models/ncs-settings.model';
+import JSZip from 'jszip';
 
 @Component({
   selector: 'app-ncs-settings',
@@ -30,7 +32,8 @@ import { Group, GroupMember, EditableGroup, AppUser } from '../_models/ncs-setti
     MatMenuModule,
     MatSelectModule,
     MatChipsModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './ncs-settings.html',
   styleUrl: './ncs-settings.css',
@@ -53,6 +56,11 @@ export class NcsSettings implements OnInit {
   // Known users for autocomplete
   knownUsers: AppUser[] = [];
   filteredUsers: AppUser[] = [];
+
+  // Backup
+  backupFormat: 'json' | 'csv' = 'json';
+  isBackingUp: boolean = false;
+  backupError: string = '';
 
   @ViewChild('groupSort') groupSort!: MatSort;
 
@@ -296,5 +304,115 @@ export class NcsSettings implements OnInit {
     this.groupMembers = [];
     this.newMemberEmail = '';
     this.memberEmailError = '';
+  }
+
+  // --- Backup ---
+
+  async downloadBackup(): Promise<void> {
+    this.isBackingUp = true;
+    this.backupError = '';
+
+    try {
+      const data = await this.firebaseService.getAllDataForBackup();
+      const zip = new JSZip();
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+
+      if (this.backupFormat === 'json') {
+        // Add JSON files
+        zip.file('nets.json', JSON.stringify(data.nets, null, 2));
+        zip.file('people.json', JSON.stringify(data.people, null, 2));
+        zip.file('groups.json', JSON.stringify(data.groups, null, 2));
+        zip.file('groupMembers.json', JSON.stringify(data.groupMembers, null, 2));
+        zip.file('users.json', JSON.stringify(data.users, null, 2));
+        zip.file('duties.json', JSON.stringify(data.duties, null, 2));
+        zip.file('locations.json', JSON.stringify(data.locations, null, 2));
+      } else {
+        // Add CSV files
+        zip.file('nets.csv', this.convertToCSV(data.nets));
+        zip.file('people.csv', this.convertToCSV(data.people));
+        zip.file('groups.csv', this.convertToCSV(data.groups));
+        zip.file('groupMembers.csv', this.convertToCSV(data.groupMembers));
+        zip.file('users.csv', this.convertToCSV(data.users));
+        zip.file('duties.csv', this.convertToCSV(data.duties));
+        zip.file('locations.csv', this.convertToCSV(data.locations));
+
+        // For nets with entries, create separate CSV files
+        for (const net of data.nets) {
+          if (net.entries) {
+            const entries = Object.keys(net.entries).map(key => ({
+              id: key,
+              ...net.entries[key]
+            }));
+            if (entries.length > 0) {
+              const safeName = net.name?.replace(/[^a-zA-Z0-9]/g, '_') || net.id;
+              zip.file(`net_entries_${safeName}.csv`, this.convertToCSV(entries));
+            }
+          }
+        }
+      }
+
+      // Generate and download zip
+      const content = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(content);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `ncs-backup-${timestamp}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error creating backup:', error);
+      this.backupError = 'Failed to create backup. Please try again.';
+    } finally {
+      this.isBackingUp = false;
+    }
+  }
+
+  private convertToCSV(data: any[]): string {
+    if (!data || data.length === 0) {
+      return '';
+    }
+
+    // Get all unique keys from all objects
+    const allKeys = new Set<string>();
+    data.forEach(item => {
+      Object.keys(item).forEach(key => {
+        // Skip nested objects like 'entries' in nets
+        if (typeof item[key] !== 'object' || item[key] === null) {
+          allKeys.add(key);
+        }
+      });
+    });
+
+    const headers = Array.from(allKeys);
+    const csvRows: string[] = [];
+
+    // Header row
+    csvRows.push(headers.map(h => this.escapeCSV(h)).join(','));
+
+    // Data rows
+    for (const item of data) {
+      const values = headers.map(header => {
+        const value = item[header];
+        if (value === null || value === undefined) {
+          return '';
+        }
+        if (Array.isArray(value)) {
+          return this.escapeCSV(value.join('; '));
+        }
+        return this.escapeCSV(String(value));
+      });
+      csvRows.push(values.join(','));
+    }
+
+    return csvRows.join('\n');
+  }
+
+  private escapeCSV(value: string): string {
+    if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+      return `"${value.replace(/"/g, '""')}"`;
+    }
+    return value;
   }
 }

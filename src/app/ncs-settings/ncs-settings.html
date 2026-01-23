@@ -161,4 +161,45 @@
       </div>
     </div>
   </div>
+
+  <!-- Backup Section -->
+  <div class="row">
+    <div class="col-12">
+      <div class="section-card">
+        <div class="section-header">
+          <h2>Data Backup</h2>
+        </div>
+
+        <p class="backup-description">
+          Download a backup of all application data including NETs, people, groups, users, duties, and locations.
+        </p>
+
+        <div class="backup-controls">
+          <mat-form-field appearance="outline" class="format-select">
+            <mat-label>File Format</mat-label>
+            <mat-select [(value)]="backupFormat">
+              <mat-option value="json">JSON</mat-option>
+              <mat-option value="csv">CSV</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" (click)="downloadBackup()" [disabled]="isBackingUp">
+            <mat-spinner *ngIf="isBackingUp" diameter="20" class="button-spinner"></mat-spinner>
+            <mat-icon *ngIf="!isBackingUp">download</mat-icon>
+            {{ isBackingUp ? 'Creating Backup...' : 'Download Backup' }}
+          </button>
+        </div>
+
+        <div class="error-message" *ngIf="backupError">
+          <mat-icon>error</mat-icon>
+          {{ backupError }}
+        </div>
+
+        <div class="backup-info">
+          <p><strong>JSON format:</strong> Best for restoring data or programmatic use. Preserves all data types and structure.</p>
+          <p><strong>CSV format:</strong> Best for viewing in spreadsheet applications. Each collection is saved as a separate file.</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
