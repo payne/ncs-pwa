@@ -534,6 +534,28 @@ Create a button in the `/ncs-settings` page that deletes all the data in firebas
 
 ---
 
+### Interaction 33: Update Firebase Database Rules for Group-Based Write Permissions
+**User Prompt:**
+Change `database.rules.json` to reflect the fact that to write to the nets document one must be changing a record that was created by a user that is in the same group as the user doing the write.
+
+**Claude Actions:**
+- Updated `database.rules.json` with comprehensive security rules:
+  - **nets**: Write allowed if user is super user (matt.n3pay@gmail.com), DCARES member, NET creator, or in same group as creator
+  - **people, groups, groupMembers, userGroups**: Write only for super user or DCARES members
+  - **users**: Users can write their own profile; admins can write any
+  - **duties, locations**: Any authenticated user can write
+- Added `userGroups` index structure (`userGroups/{sanitizedEmail}/{groupName}` = true) for efficient permission lookups
+- Updated `firebase.service.ts`:
+  - Modified `addGroupMember()` to also update `userGroups` index
+  - Modified `deleteGroupMember()` to also clean up `userGroups` index
+  - Modified `deleteGroupWithMembers()` to clean up `userGroups` for all removed members
+  - Modified `resetAllData()` to delete and recreate `userGroups` index
+  - Updated `getAllDataForBackup()` to include `userGroups` in backups
+- Updated `ncs-settings.ts` to include `userGroups` in backup ZIP files
+- Updated `user-manual.md` to mention user group index in backup contents
+
+---
+
 ## Future Interactions
 
 *(New interactions will be appended below)*

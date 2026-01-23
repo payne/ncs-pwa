@@ -329,6 +329,7 @@ export class NcsSettings implements OnInit {
         zip.file('groups.json', JSON.stringify(data.groups, null, 2));
         zip.file('groupMembers.json', JSON.stringify(data.groupMembers, null, 2));
         zip.file('users.json', JSON.stringify(data.users, null, 2));
+        zip.file('userGroups.json', JSON.stringify(data.userGroups, null, 2));
         zip.file('duties.json', JSON.stringify(data.duties, null, 2));
         zip.file('locations.json', JSON.stringify(data.locations, null, 2));
       } else {
@@ -338,6 +339,7 @@ export class NcsSettings implements OnInit {
         zip.file('groups.csv', this.convertToCSV(data.groups));
         zip.file('groupMembers.csv', this.convertToCSV(data.groupMembers));
         zip.file('users.csv', this.convertToCSV(data.users));
+        zip.file('userGroups.csv', this.convertToCSV(data.userGroups));
         zip.file('duties.csv', this.convertToCSV(data.duties));
         zip.file('locations.csv', this.convertToCSV(data.locations));
 

@@ -252,6 +252,7 @@ DCARES administrators can download a complete backup of all application data.
 - Groups
 - Group memberships
 - Users
+- User group index (for permission checking)
 - Duties
 - Locations
 

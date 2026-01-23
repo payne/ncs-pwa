@@ -1,6 +1,69 @@
 {
   "rules": {
-    ".read":  "auth != null",
-    ".write": "auth != null"
+    ".read": "auth != null",
+
+    "nets": {
+      "$netId": {
+        ".write": "auth != null && (
+          auth.token.email == 'matt.n3pay@gmail.com' ||
+          root.child('userGroups').child(auth.token.email.replace('.', ',')).child('DCARES').val() == true ||
+          data.child('creatorEmail').val() == auth.token.email ||
+          (
+            data.child('creatorGroup').val() != null &&
+            root.child('userGroups').child(auth.token.email.replace('.', ',')).child(data.child('creatorGroup').val()).val() == true
+          ) ||
+          (
+            !data.exists() &&
+            newData.child('creatorEmail').val() == auth.token.email
+          )
+        )"
+      }
+    },
+
+    "people": {
+      ".write": "auth != null && (
+        auth.token.email == 'matt.n3pay@gmail.com' ||
+        root.child('userGroups').child(auth.token.email.replace('.', ',')).child('DCARES').val() == true
+      )"
+    },
+
+    "groups": {
+      ".write": "auth != null && (
+        auth.token.email == 'matt.n3pay@gmail.com' ||
+        root.child('userGroups').child(auth.token.email.replace('.', ',')).child('DCARES').val() == true
+      )"
+    },
+
+    "groupMembers": {
+      ".write": "auth != null && (
+        auth.token.email == 'matt.n3pay@gmail.com' ||
+        root.child('userGroups').child(auth.token.email.replace('.', ',')).child('DCARES').val() == true
+      )"
+    },
+
+    "userGroups": {
+      ".write": "auth != null && (
+        auth.token.email == 'matt.n3pay@gmail.com' ||
+        root.child('userGroups').child(auth.token.email.replace('.', ',')).child('DCARES').val() == true
+      )"
+    },
+
+    "users": {
+      "$sanitizedEmail": {
+        ".write": "auth != null && (
+          auth.token.email.replace('.', ',') == $sanitizedEmail ||
+          auth.token.email == 'matt.n3pay@gmail.com' ||
+          root.child('userGroups').child(auth.token.email.replace('.', ',')).child('DCARES').val() == true
+        )"
+      }
+    },
+
+    "duties": {
+      ".write": "auth != null"
+    },
+
+    "locations": {
+      ".write": "auth != null"
+    }
   }
 }
