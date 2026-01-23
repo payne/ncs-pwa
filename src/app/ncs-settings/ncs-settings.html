@@ -1,0 +1,152 @@
+<div class="container-fluid">
+  <h1>Settings</h1>
+
+  <div class="row">
+    <!-- Groups Section -->
+    <div class="col-12 col-lg-6">
+      <div class="section-card">
+        <div class="section-header">
+          <h2>Groups</h2>
+          <mat-form-field appearance="outline" class="filter-input">
+            <mat-label>Filter</mat-label>
+            <input matInput (keyup)="applyGroupFilter($event)" placeholder="Search...">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="error-message" *ngIf="groupNameError">
+          <mat-icon>error</mat-icon>
+          {{ groupNameError }}
+        </div>
+
+        <div class="table-container">
+          <table mat-table [dataSource]="groupDataSource" matSort #groupSort="matSort" class="mat-elevation-z2">
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+              <td mat-cell *matCellDef="let group">
+                <ng-container *ngIf="group.isNew">
+                  <input class="cell-input" [(ngModel)]="addGroupPlaceholder.name" placeholder="Group name">
+                </ng-container>
+                <ng-container *ngIf="!group.isNew">
+                  <input class="cell-input" [value]="group.name"
+                         (blur)="onGroupCellBlur(group, 'name', $any($event.target).value)">
+                </ng-container>
+              </td>
+            </ng-container>
+
+            <!-- Description Column -->
+            <ng-container matColumnDef="description">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
+              <td mat-cell *matCellDef="let group">
+                <ng-container *ngIf="group.isNew">
+                  <input class="cell-input" [(ngModel)]="addGroupPlaceholder.description" placeholder="Description">
+                </ng-container>
+                <ng-container *ngIf="!group.isNew">
+                  <input class="cell-input" [value]="group.description"
+                         (blur)="onGroupCellBlur(group, 'description', $any($event.target).value)">
+                </ng-container>
+              </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef class="actions-header"></th>
+              <td mat-cell *matCellDef="let group" class="actions-cell">
+                <ng-container *ngIf="group.isNew">
+                  <button mat-icon-button color="primary" (click)="addGroup()" matTooltip="Add Group">
+                    <mat-icon>add</mat-icon>
+                  </button>
+                </ng-container>
+                <ng-container *ngIf="!group.isNew">
+                  <button mat-icon-button color="primary" (click)="selectGroup(group)" matTooltip="Manage Members"
+                          [class.selected-group-btn]="selectedGroupId === group.id">
+                    <mat-icon>group</mat-icon>
+                  </button>
+                  <button mat-icon-button [matMenuTriggerFor]="actionMenu" class="action-menu-btn">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #actionMenu="matMenu">
+                    <button mat-menu-item (click)="deleteGroup(group)" class="delete-action">
+                      <mat-icon color="warn">delete</mat-icon>
+                      <span>Delete</span>
+                    </button>
+                  </mat-menu>
+                </ng-container>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="groupDisplayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: groupDisplayedColumns;"
+                [class.add-row]="row.isNew"
+                [class.selected-row]="row.id === selectedGroupId"></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Group Members Section -->
+    <div class="col-12 col-lg-6">
+      <div class="section-card">
+        <div class="section-header">
+          <h2>
+            <ng-container *ngIf="selectedGroupId">
+              Members of "{{ selectedGroupName }}"
+            </ng-container>
+            <ng-container *ngIf="!selectedGroupId">
+              Group Members
+            </ng-container>
+          </h2>
+          <button mat-icon-button *ngIf="selectedGroupId" (click)="clearGroupSelection()" matTooltip="Clear Selection">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <div *ngIf="!selectedGroupId" class="empty-state">
+          <mat-icon>group_add</mat-icon>
+          <p>Select a group from the table to manage its members</p>
+        </div>
+
+        <div *ngIf="selectedGroupId" class="members-section">
+          <!-- Add Member Form -->
+          <div class="add-member-form">
+            <mat-form-field appearance="outline" class="email-input">
+              <mat-label>Email address</mat-label>
+              <input matInput [(ngModel)]="newMemberEmail" placeholder="user@example.com"
+                     (keyup.enter)="addMember()">
+              <mat-icon matSuffix>email</mat-icon>
+            </mat-form-field>
+            <button mat-raised-button color="primary" (click)="addMember()">
+              <mat-icon>person_add</mat-icon>
+              Add
+            </button>
+          </div>
+
+          <div class="error-message" *ngIf="memberEmailError">
+            <mat-icon>error</mat-icon>
+            {{ memberEmailError }}
+          </div>
+
+          <!-- Members List -->
+          <div class="members-list" *ngIf="groupMembers.length > 0">
+            <div class="member-item" *ngFor="let member of groupMembers">
+              <div class="member-email">
+                <mat-icon>person</mat-icon>
+                {{ member.email }}
+              </div>
+              <button mat-icon-button color="warn" (click)="removeMember(member)" matTooltip="Remove">
+                <mat-icon>remove_circle</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="groupMembers.length === 0" class="empty-state small">
+            <mat-icon>person_off</mat-icon>
+            <p>No members in this group yet</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

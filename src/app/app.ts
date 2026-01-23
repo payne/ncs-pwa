@@ -19,12 +19,12 @@ export class App {
 
   menuItems = [
     { path: '/ncs-select-net', label: 'Select NET', icon: 'dns', action: null },
-    { path: '/ncs-select-net', label: 'Select NET', icon: 'dns', action: null },
     { path: '/ncs-net-assignments', label: 'NET Assignments', icon: 'assignment', action: null },
     { path: '/ncs-view2', label: 'View 2', icon: 'table_chart', action: null },
     { path: '/ncs-people', label: 'People', icon: 'people', action: null },
     { path: '/ncs-locations', label: 'Locations', icon: 'location_on', action: null },
     { path: '/ncs-duties', label: 'Duties', icon: 'work', action: null },
+    { path: '/ncs-settings', label: 'Settings', icon: 'settings', action: null },
     { path: null, label: 'Logout', icon: 'logout', action: 'logout' },
     { path: '/ncs-about', label: 'About', icon: 'info', action: null }
   ];

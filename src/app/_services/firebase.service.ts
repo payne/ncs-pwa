@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { getDatabase, Database, ref, set, onValue, push, remove, update, off, get } from 'firebase/database';
 import { NetEntry } from '../_models/net-entry.model';
 import { Operator } from '../_models/operator.model';
+import { Group, GroupMember } from '../_models/ncs-settings.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -163,6 +164,114 @@ export class FirebaseService {
   deletePerson(personId: string): Promise<void> {
     const personRef = ref(this.db, `people/${personId}`);
     return remove(personRef);
+  }
+
+  // Groups collection methods
+  getGroups(): Observable<Group[]> {
+    return new Observable(observer => {
+      const groupsRef = ref(this.db, 'groups');
+
+      const unsubscribe = onValue(groupsRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          const groups: Group[] = Object.keys(data).map(key => ({
+            ...data[key],
+            id: key
+          }));
+          observer.next(groups);
+        } else {
+          observer.next([]);
+        }
+      }, (error) => {
+        observer.error(error);
+      });
+
+      return () => {
+        off(groupsRef);
+      };
+    });
+  }
+
+  addGroup(group: Group): Promise<void> {
+    const groupsRef = ref(this.db, 'groups');
+    const newGroupRef = push(groupsRef);
+    return set(newGroupRef, {
+      name: group.name,
+      description: group.description
+    });
+  }
+
+  updateGroup(groupId: string, data: Partial<Group>): Promise<void> {
+    const groupRef = ref(this.db, `groups/${groupId}`);
+    const { id, ...updateData } = data as any;
+    return update(groupRef, updateData);
+  }
+
+  deleteGroup(groupId: string): Promise<void> {
+    const groupRef = ref(this.db, `groups/${groupId}`);
+    return remove(groupRef);
+  }
+
+  async deleteGroupWithMembers(groupId: string): Promise<void> {
+    // First get all members of this group and delete them
+    const membersRef = ref(this.db, 'groupMembers');
+    const snapshot = await get(membersRef);
+    const data = snapshot.val();
+
+    if (data) {
+      const deletePromises: Promise<void>[] = [];
+      Object.keys(data).forEach(key => {
+        if (data[key].groupId === groupId) {
+          deletePromises.push(remove(ref(this.db, `groupMembers/${key}`)));
+        }
+      });
+      await Promise.all(deletePromises);
+    }
+
+    // Then delete the group itself
+    return this.deleteGroup(groupId);
+  }
+
+  // Group Members collection methods
+  getGroupMembers(groupId: string): Observable<GroupMember[]> {
+    return new Observable(observer => {
+      const membersRef = ref(this.db, 'groupMembers');
+
+      const unsubscribe = onValue(membersRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          const members: GroupMember[] = Object.keys(data)
+            .filter(key => data[key].groupId === groupId)
+            .map(key => ({
+              ...data[key],
+              id: key
+            }));
+          observer.next(members);
+        } else {
+          observer.next([]);
+        }
+      }, (error) => {
+        observer.error(error);
+      });
+
+      return () => {
+        off(membersRef);
+      };
+    });
+  }
+
+  addGroupMember(member: GroupMember): Promise<void> {
+    const membersRef = ref(this.db, 'groupMembers');
+    const newMemberRef = push(membersRef);
+    return set(newMemberRef, {
+      groupId: member.groupId,
+      email: member.email
+    });
+  }
+
+  deleteGroupMember(memberId: string): Promise<void> {
+    const memberRef = ref(this.db, `groupMembers/${memberId}`);
+    return remove(memberRef);
   }
 
   private getDefaultEntry(): NetEntry {
