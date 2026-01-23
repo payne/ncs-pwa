@@ -4,6 +4,36 @@
   padding: 2rem;
 }
 
+.alert-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.alert-message.warning {
+  background-color: rgba(255, 242, 0, 0.2);
+  border: 1px solid var(--color-warning);
+  color: var(--color-dark);
+}
+
+.alert-message mat-icon {
+  color: #d4a500;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.alert-message strong {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.alert-message p {
+  margin: 0;
+}
+
 h1 {
   margin-bottom: 1.5rem;
 }

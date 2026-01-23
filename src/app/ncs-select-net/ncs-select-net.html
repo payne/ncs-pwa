@@ -1,18 +1,36 @@
 <div class="container-fluid">
   <h1>Select NET</h1>
 
+  <div class="alert-message warning" *ngIf="showNoAccessMessage">
+    <mat-icon>warning</mat-icon>
+    <span>You don't have access to the previously selected NET. Please select a NET you have access to.</span>
+  </div>
+
   <div class="net-selector-container">
     <div class="net-selector">
       <mat-form-field appearance="outline">
         <mat-label>Select NET</mat-label>
         <mat-select [(value)]="currentNetId" (selectionChange)="selectNet($event.value)">
-          <mat-option *ngFor="let net of nets" [value]="net.id">
+          <mat-option *ngFor="let net of accessibleNets" [value]="net.id">
             {{ net.name }}
+            <span class="net-group-badge" *ngIf="net.creatorGroup">({{ net.creatorGroup }})</span>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="create-net-section" *ngIf="userGroups.length > 0">
+      <mat-form-field appearance="outline" *ngIf="userGroups.length > 1" class="group-selector">
+        <mat-label>Create NET for Group</mat-label>
+        <mat-select [(value)]="selectedGroupForNewNet">
+          <mat-option *ngFor="let group of userGroups" [value]="group">
+            {{ group }}
           </mat-option>
         </mat-select>
       </mat-form-field>
       <button mat-raised-button color="accent" (click)="createNewNet()" class="create-net-button">
         <mat-icon>add</mat-icon> Create New NET
+        <span *ngIf="userGroups.length === 1"> ({{ userGroups[0] }})</span>
       </button>
     </div>
 

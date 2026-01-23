@@ -1,4 +1,12 @@
 <div class="container">
+  <div class="alert-message warning" *ngIf="showNoGroupMessage">
+    <mat-icon>warning</mat-icon>
+    <div>
+      <strong>No Group Membership</strong>
+      <p>You are not currently a member of any group. Please contact an administrator to be added to a group before you can access NET features.</p>
+    </div>
+  </div>
+
   <h1>About</h1>
   <p>NCS Progressive Web Application</p>
   <p>This PWA provides offline-capable management for NET assignments, personnel, locations, and duties.</p>

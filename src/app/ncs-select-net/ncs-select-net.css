@@ -2,6 +2,28 @@ h1 {
   margin-bottom: 2rem;
 }
 
+.alert-message {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.alert-message.warning {
+  background-color: rgba(255, 242, 0, 0.2);
+  border: 1px solid var(--color-warning);
+  color: var(--color-dark);
+}
+
+.alert-message mat-icon {
+  color: #d4a500;
+}
+
 .net-selector-container {
   max-width: 600px;
   margin: 0 auto;
@@ -24,9 +46,30 @@ h1 {
   flex: 1;
 }
 
+.create-net-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.group-selector {
+  min-width: 200px;
+}
+
 .create-net-button {
   height: 56px;
   white-space: nowrap;
+}
+
+.net-group-badge {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-left: 0.5rem;
 }
 
 .current-net-info {

@@ -68,7 +68,7 @@ export class FirebaseService {
     return remove(entryRef);
   }
 
-  createNet(netName: string): Promise<string> {
+  createNet(netName: string, creatorEmail: string, creatorGroup: string): Promise<string> {
     const netsRef = ref(this.db, 'nets');
     const newNetRef = push(netsRef);
     const netId = newNetRef.key || '';
@@ -76,6 +76,8 @@ export class FirebaseService {
     return set(newNetRef, {
       name: netName,
       createdAt: Date.now(),
+      creatorEmail: creatorEmail,
+      creatorGroup: creatorGroup,
       entries: {}
     }).then(() => netId);
   }
@@ -90,7 +92,9 @@ export class FirebaseService {
           const nets = Object.keys(data).map(key => ({
             id: key,
             name: data[key].name,
-            createdAt: data[key].createdAt
+            createdAt: data[key].createdAt,
+            creatorEmail: data[key].creatorEmail || '',
+            creatorGroup: data[key].creatorGroup || ''
           }));
           observer.next(nets);
         } else {
@@ -104,6 +108,22 @@ export class FirebaseService {
         off(netsRef);
       };
     });
+  }
+
+  async getNetOnce(netId: string): Promise<any> {
+    const netRef = ref(this.db, `nets/${netId}`);
+    const snapshot = await get(netRef);
+    const data = snapshot.val();
+    if (data) {
+      return {
+        id: netId,
+        name: data.name,
+        createdAt: data.createdAt,
+        creatorEmail: data.creatorEmail || '',
+        creatorGroup: data.creatorGroup || ''
+      };
+    }
+    return null;
   }
 
   // People collection methods
