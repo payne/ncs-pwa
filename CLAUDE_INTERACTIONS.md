@@ -596,3 +596,43 @@ Ensure the grid line thickness setting applies to both horizontal and vertical g
 - Updated `ncs-view2.css` to apply `--grid-line-thickness` to `border-bottom` in addition to `border-right`.
 - Updated `ncs-net-assignments.css` to apply `--grid-line-thickness` to `border-bottom` in addition to `border-right`.
 - Verified visually that the full grid is rendered with the configurable thickness.
+
+---
+
+### Interaction 37: Create Main View Component
+**User Prompt:**
+Create `/ncs-main-view` and put it right after `Select NET` in the hamburger menu. This component will also be an editable table. New people are checked in by entering their callsign in the first row. All rows can be live updated by clicking on a cell and editing it. On top is a component with `Net Control Op:`, `Type` (a drop down), `Net Opened:` (a date & time stamp) that is set when the `Start New NET` button is clicked, `Reason for Net:` (one line of free text), `Comments:` a three line text area that takes most of the width of the component. Columns in the table include: 1. Call 2. First 3. Last Initial 4. Assignment 1 5. Four single letter status indicators (background color varies based on the letter entered)
+
+**Claude Actions:**
+- Created `src/app/_models/ncs-main-view.model.ts` with interfaces:
+  - `MainViewEntry` (id, call, first, lastInitial, assignment1, status1-4, timeIn)
+  - `MainViewHeader` (netControlOp, type, netOpened, reasonForNet, comments)
+- Created `src/app/ncs-main-view/ncs-main-view.ts` component:
+  - Header section with Net Control Op, Type dropdown, Net Opened timestamp, Reason, Comments textarea
+  - Start button that sets netOpened timestamp
+  - Editable table with callsign autocomplete from people collection
+  - Status columns with color-coded backgrounds (P=green, A=red, L=yellow, E=blue, X=gray)
+  - Read-only mode for users not in same group as NET creator
+  - Inline editing with auto-save on blur
+- Created `src/app/ncs-main-view/ncs-main-view.html`:
+  - Header section with responsive form fields
+  - Autocomplete dropdown for callsign entry
+  - Table with all 8 data columns plus actions
+  - Status legend showing color meanings
+- Created `src/app/ncs-main-view/ncs-main-view.css`:
+  - Styling for header section with form fields
+  - Grid lines using `--grid-line-thickness` CSS variable
+  - Status color classes (status-present, status-absent, status-late, status-excused, status-checked-out)
+  - Responsive media queries
+- Added to `firebase.service.ts`:
+  - `getMainViewEntries()` - Observable for main view entries
+  - `addMainViewEntry()` - Add new entry
+  - `updateMainViewEntry()` - Update existing entry
+  - `deleteMainViewEntry()` - Delete entry
+  - `getMainViewHeader()` - Observable for header data
+  - `saveMainViewHeader()` - Save header data
+- Updated `app.routes.ts`:
+  - Added import for `NcsMainView`
+  - Added route `/ncs-main-view` with `netAccessGuard`
+- Updated `app.ts`:
+  - Added "Main View" menu item with `checklist` icon right after "Select NET"

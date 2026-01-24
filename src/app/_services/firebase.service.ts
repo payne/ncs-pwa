@@ -3,6 +3,7 @@ import { getDatabase, Database, ref, set, onValue, push, remove, update, off, ge
 import { NetEntry } from '../_models/net-entry.model';
 import { Operator } from '../_models/operator.model';
 import { Group, GroupMember, AppUser } from '../_models/ncs-settings.model';
+import { MainViewEntry, MainViewHeader } from '../_models/ncs-main-view.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -451,6 +452,76 @@ export class FirebaseService {
       duties: transformData(dutiesSnapshot),
       locations: transformData(locationsSnapshot)
     };
+  }
+
+  // Main View methods
+  getMainViewEntries(netId: string): Observable<MainViewEntry[]> {
+    return new Observable(observer => {
+      const entriesRef = ref(this.db, `nets/${netId}/mainViewEntries`);
+
+      const unsubscribe = onValue(entriesRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          const entries: MainViewEntry[] = Object.keys(data).map(key => ({
+            ...data[key],
+            id: key
+          }));
+          observer.next(entries);
+        } else {
+          observer.next([]);
+        }
+      }, (error) => {
+        observer.error(error);
+      });
+
+      return () => {
+        off(entriesRef);
+      };
+    });
+  }
+
+  addMainViewEntry(netId: string, entry: MainViewEntry): Promise<void> {
+    const entriesRef = ref(this.db, `nets/${netId}/mainViewEntries`);
+    const newEntryRef = push(entriesRef);
+    const { id, isEditing, ...entryWithoutId } = entry as any;
+    return set(newEntryRef, entryWithoutId);
+  }
+
+  updateMainViewEntry(netId: string, entryId: string, data: Partial<MainViewEntry>): Promise<void> {
+    const entryRef = ref(this.db, `nets/${netId}/mainViewEntries/${entryId}`);
+    const { id, isEditing, ...updateData } = data as any;
+    return update(entryRef, updateData);
+  }
+
+  deleteMainViewEntry(netId: string, entryId: string): Promise<void> {
+    const entryRef = ref(this.db, `nets/${netId}/mainViewEntries/${entryId}`);
+    return remove(entryRef);
+  }
+
+  getMainViewHeader(netId: string): Observable<MainViewHeader | null> {
+    return new Observable(observer => {
+      const headerRef = ref(this.db, `nets/${netId}/mainViewHeader`);
+
+      const unsubscribe = onValue(headerRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          observer.next(data as MainViewHeader);
+        } else {
+          observer.next(null);
+        }
+      }, (error) => {
+        observer.error(error);
+      });
+
+      return () => {
+        off(headerRef);
+      };
+    });
+  }
+
+  saveMainViewHeader(netId: string, header: MainViewHeader): Promise<void> {
+    const headerRef = ref(this.db, `nets/${netId}/mainViewHeader`);
+    return set(headerRef, header);
   }
 
   private getDefaultEntry(): NetEntry {
