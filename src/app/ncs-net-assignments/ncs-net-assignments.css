@@ -126,7 +126,7 @@ table {
 /* Grid lines */
 :host ::ng-deep .mat-mdc-header-cell,
 :host ::ng-deep .mat-mdc-cell {
-  border-right: 1px solid rgba(0, 0, 0, 0.12);
+  border-right: var(--grid-line-thickness, 1px) solid rgba(0, 0, 0, 0.12);
 }
 
 :host ::ng-deep .mat-mdc-header-cell:last-child,

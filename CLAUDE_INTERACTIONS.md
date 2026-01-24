@@ -567,6 +567,21 @@ Add grid lines to the tables in both of these routes `/ncs-view2` and `/ncs-net-
 
 ---
 
+### Interaction 35: Adjustable Grid Line Thickness
+**User Prompt:**
+Great! In the settings route add a bit to adjust the thickness of the grid lines.
+
+**Claude Actions:**
+- Added CSS variable `--grid-line-thickness` to `styles.css`
+- Updated `ncs-view2.css` and `ncs-net-assignments.css` to use the CSS variable
+- Added `MatSliderModule` to `ncs-settings.ts`
+- Added grid line thickness slider to User Preferences section in `ncs-settings.html`
+- Implemented logic in `ncs-settings.ts` to save setting to localStorage and update CSS variable
+- Updated `app.ts` to initialize the CSS variable from localStorage on app startup
+- Verified CSS variable application using Playwright script
+
+---
+
 ## Future Interactions
 
 *(New interactions will be appended below)*
