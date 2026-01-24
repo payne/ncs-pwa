@@ -16,62 +16,95 @@
   <div *ngIf="currentNetId" class="main-view-content">
     <!-- Header Section -->
     <div class="header-section">
-      <div class="header-controls-row">
-        <div class="header-field">
-          <label>Net Control Op:</label>
-          <input type="text"
-                 class="header-input"
-                 [(ngModel)]="header.netControlOp"
-                 (blur)="onHeaderFieldBlur()"
-                 [disabled]="!canEdit"
-                 placeholder="Enter operator name">
-        </div>
+      <div class="header-toggle" (click)="toggleHeader()">
+        <mat-icon>{{ headerCollapsed ? 'expand_more' : 'expand_less' }}</mat-icon>
+        <span>Net Details</span>
+        <span class="header-summary" *ngIf="headerCollapsed && header.netOpened">
+          | {{ header.type || 'No type' }} | Started: {{ header.netOpened }}
+          <span *ngIf="header.netStopped"> | Stopped: {{ header.netStopped }}</span>
+        </span>
+      </div>
 
-        <div class="header-field">
-          <label>Type:</label>
-          <select class="header-select"
-                  [(ngModel)]="header.type"
-                  (change)="onHeaderFieldBlur()"
-                  [disabled]="!canEdit">
-            <option value="">Select type...</option>
-            <option *ngFor="let type of netTypes" [value]="type">{{ type }}</option>
-          </select>
-        </div>
+      <div class="header-content" *ngIf="!headerCollapsed">
+        <div class="header-controls-row">
+          <div class="header-field">
+            <label>Net Control Op:</label>
+            <input type="text"
+                   class="header-input"
+                   [(ngModel)]="header.netControlOp"
+                   (blur)="onHeaderFieldBlur()"
+                   [disabled]="!canEdit"
+                   placeholder="Enter operator name">
+          </div>
 
-        <div class="header-field">
-          <label>Net Opened:</label>
-          <div class="net-opened-group">
-            <span class="net-opened-value">{{ header.netOpened || 'Not started' }}</span>
-            <button mat-raised-button
-                    color="primary"
-                    (click)="startNewNet()"
-                    [disabled]="!canEdit || header.netOpened"
-                    class="start-btn">
-              <mat-icon>play_arrow</mat-icon>
-              Start
-            </button>
+          <div class="header-field">
+            <label>Type:</label>
+            <select class="header-select"
+                    [(ngModel)]="header.type"
+                    (change)="onHeaderFieldBlur()"
+                    [disabled]="!canEdit">
+              <option value="">Select type...</option>
+              <option *ngFor="let type of netTypes" [value]="type">{{ type }}</option>
+            </select>
+          </div>
+
+          <div class="header-field">
+            <label>Reason for Net:</label>
+            <input type="text"
+                   class="header-input"
+                   [(ngModel)]="header.reasonForNet"
+                   (blur)="onHeaderFieldBlur()"
+                   [disabled]="!canEdit"
+                   placeholder="Enter reason">
           </div>
         </div>
 
-        <div class="header-field">
-          <label>Reason for Net:</label>
-          <input type="text"
-                 class="header-input"
-                 [(ngModel)]="header.reasonForNet"
-                 (blur)="onHeaderFieldBlur()"
-                 [disabled]="!canEdit"
-                 placeholder="Enter reason">
-        </div>
-      </div>
+        <div class="header-timing-row">
+          <div class="header-field">
+            <label>Net Opened:</label>
+            <div class="timing-group">
+              <input type="text"
+                     class="header-input timing-input"
+                     [(ngModel)]="header.netOpened"
+                     (blur)="onHeaderFieldBlur()"
+                     [disabled]="!canEdit"
+                     placeholder="Not started">
+              <button mat-raised-button
+                      [color]="isNetRunning() ? 'warn' : 'primary'"
+                      (click)="toggleNetStatus()"
+                      [disabled]="!canEdit || (header.netOpened && header.netStopped)"
+                      class="start-stop-btn">
+                <mat-icon>{{ isNetRunning() ? 'stop' : 'play_arrow' }}</mat-icon>
+                {{ isNetRunning() ? 'Stop' : 'Start' }}
+              </button>
+            </div>
+          </div>
 
-      <div class="header-comments">
-        <label>Comments:</label>
-        <textarea class="comments-textarea"
-                  [(ngModel)]="header.comments"
-                  (blur)="onHeaderFieldBlur()"
-                  [disabled]="!canEdit"
-                  rows="3"
-                  placeholder="Enter comments..."></textarea>
+          <div class="header-field">
+            <label>Net Stopped:</label>
+            <input type="text"
+                   class="header-input timing-input"
+                   [(ngModel)]="header.netStopped"
+                   (blur)="onHeaderFieldBlur()"
+                   [disabled]="!canEdit"
+                   placeholder="Not stopped">
+          </div>
+
+          <div class="header-field">
+            <label>Net Duration:</label>
+            <span class="duration-value">{{ getNetDuration() || '--' }}</span>
+          </div>
+        </div>
+
+        <div class="header-comments">
+          <label>Comments:</label>
+          <textarea class="comments-textarea"
+                    [(ngModel)]="header.comments"
+                    (blur)="onHeaderFieldBlur()"
+                    [disabled]="!canEdit"
+                    rows="3"
+                    placeholder="Enter comments..."></textarea>
+        </div>
       </div>
     </div>
 
@@ -244,6 +277,122 @@
                      [value]="entry.status4"
                      (blur)="onCellBlur(entry, 'status4', $any($event.target).value)"
                      maxlength="1"
+                     [disabled]="!canEdit">
+            </ng-container>
+          </td>
+        </ng-container>
+
+        <!-- Assignment 2 Column -->
+        <ng-container matColumnDef="assignment2">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Assignment 2</th>
+          <td mat-cell *matCellDef="let entry">
+            <ng-container *ngIf="entry.isNew && canEdit">
+              <input class="add-row-input"
+                     [(ngModel)]="addEntryPlaceholder.assignment2"
+                     placeholder="Assignment 2">
+            </ng-container>
+            <ng-container *ngIf="!entry.isNew">
+              <input class="cell-input"
+                     [value]="entry.assignment2"
+                     (blur)="onCellBlur(entry, 'assignment2', $any($event.target).value)"
+                     [disabled]="!canEdit">
+            </ng-container>
+          </td>
+        </ng-container>
+
+        <!-- Status 5 Column -->
+        <ng-container matColumnDef="status5">
+          <th mat-header-cell *matHeaderCellDef class="status-header">S5</th>
+          <td mat-cell *matCellDef="let entry" class="status-cell" [ngClass]="getStatusClass(entry.status5)">
+            <ng-container *ngIf="entry.isNew && canEdit">
+              <input class="status-input"
+                     [(ngModel)]="addEntryPlaceholder.status5"
+                     maxlength="1"
+                     placeholder="">
+            </ng-container>
+            <ng-container *ngIf="!entry.isNew">
+              <input class="status-input"
+                     [value]="entry.status5"
+                     (blur)="onCellBlur(entry, 'status5', $any($event.target).value)"
+                     maxlength="1"
+                     [disabled]="!canEdit">
+            </ng-container>
+          </td>
+        </ng-container>
+
+        <!-- Status 6 Column -->
+        <ng-container matColumnDef="status6">
+          <th mat-header-cell *matHeaderCellDef class="status-header">S6</th>
+          <td mat-cell *matCellDef="let entry" class="status-cell" [ngClass]="getStatusClass(entry.status6)">
+            <ng-container *ngIf="entry.isNew && canEdit">
+              <input class="status-input"
+                     [(ngModel)]="addEntryPlaceholder.status6"
+                     maxlength="1"
+                     placeholder="">
+            </ng-container>
+            <ng-container *ngIf="!entry.isNew">
+              <input class="status-input"
+                     [value]="entry.status6"
+                     (blur)="onCellBlur(entry, 'status6', $any($event.target).value)"
+                     maxlength="1"
+                     [disabled]="!canEdit">
+            </ng-container>
+          </td>
+        </ng-container>
+
+        <!-- Status 7 Column -->
+        <ng-container matColumnDef="status7">
+          <th mat-header-cell *matHeaderCellDef class="status-header">S7</th>
+          <td mat-cell *matCellDef="let entry" class="status-cell" [ngClass]="getStatusClass(entry.status7)">
+            <ng-container *ngIf="entry.isNew && canEdit">
+              <input class="status-input"
+                     [(ngModel)]="addEntryPlaceholder.status7"
+                     maxlength="1"
+                     placeholder="">
+            </ng-container>
+            <ng-container *ngIf="!entry.isNew">
+              <input class="status-input"
+                     [value]="entry.status7"
+                     (blur)="onCellBlur(entry, 'status7', $any($event.target).value)"
+                     maxlength="1"
+                     [disabled]="!canEdit">
+            </ng-container>
+          </td>
+        </ng-container>
+
+        <!-- Status 8 Column -->
+        <ng-container matColumnDef="status8">
+          <th mat-header-cell *matHeaderCellDef class="status-header">S8</th>
+          <td mat-cell *matCellDef="let entry" class="status-cell" [ngClass]="getStatusClass(entry.status8)">
+            <ng-container *ngIf="entry.isNew && canEdit">
+              <input class="status-input"
+                     [(ngModel)]="addEntryPlaceholder.status8"
+                     maxlength="1"
+                     placeholder="">
+            </ng-container>
+            <ng-container *ngIf="!entry.isNew">
+              <input class="status-input"
+                     [value]="entry.status8"
+                     (blur)="onCellBlur(entry, 'status8', $any($event.target).value)"
+                     maxlength="1"
+                     [disabled]="!canEdit">
+            </ng-container>
+          </td>
+        </ng-container>
+
+        <!-- Notes Column -->
+        <ng-container matColumnDef="notes">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Notes</th>
+          <td mat-cell *matCellDef="let entry">
+            <ng-container *ngIf="entry.isNew && canEdit">
+              <input class="add-row-input notes-input"
+                     [(ngModel)]="addEntryPlaceholder.notes"
+                     placeholder="Notes">
+            </ng-container>
+            <ng-container *ngIf="!entry.isNew">
+              <input class="cell-input notes-input"
+                     [value]="entry.notes"
+                     (blur)="onCellBlur(entry, 'notes', $any($event.target).value)"
                      [disabled]="!canEdit">
             </ng-container>
           </td>

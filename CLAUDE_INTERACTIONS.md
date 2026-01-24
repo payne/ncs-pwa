@@ -636,3 +636,58 @@ Create `/ncs-main-view` and put it right after `Select NET` in the hamburger men
   - Added route `/ncs-main-view` with `netAccessGuard`
 - Updated `app.ts`:
   - Added "Main View" menu item with `checklist` icon right after "Select NET"
+
+---
+
+### Interaction 38: Add More Columns to Main View
+**User Prompt:**
+Add these columns to the right of the table (but before the `+` for add):
+1. 2nd Assignment
+2. Four more single letter columns
+3. Notes
+
+**Claude Actions:**
+- Updated `ncs-main-view.model.ts`:
+  - Added fields: `assignment2`, `status5`, `status6`, `status7`, `status8`, `notes`
+- Updated `ncs-main-view.ts`:
+  - Added new columns to `displayedColumns` array
+  - Updated `createEmptyEntry()` to include new fields
+  - Updated `addEntry()` to include new fields when creating entries
+  - Updated `saveEntry()` to include new fields when saving
+- Updated `ncs-main-view.html`:
+  - Added column definitions for assignment2, status5-8, and notes
+  - All columns placed between status4 and actions column
+- Updated `ncs-main-view.css`:
+  - Added `.notes-input` class with `min-width: 120px` for wider notes field
+
+---
+
+### Interaction 39: Net Start/Stop and Collapsible Header
+**User Prompt:**
+When I click the `Start` button in `/ncs-main-view` fill in the date and time stamp next to the `Net Opened:` label. Change the button from `Start` to `Stop`. Add two labels under the `Net Opened:` label: `Net Stopped:` and `Net Duration`. Compute the net duration and fill it in. The values of both `Net Opened:` and `Net Stopped:` should be able to be edited. The header with `Net Control Op:` through `Comments` should be a rectangle that can be hidden or shown by clicking a widget.
+
+**Claude Actions:**
+- Updated `ncs-main-view.model.ts`:
+  - Added `netStopped` field to `MainViewHeader` interface
+- Updated `ncs-main-view.ts`:
+  - Added `headerCollapsed` property for collapsible header state
+  - Added `toggleHeader()` method to show/hide header content
+  - Added `isNetRunning()` helper to check if net is active
+  - Replaced `startNewNet()` with `toggleNetStatus()` that handles both start and stop
+  - Added `getNetDuration()` method to compute elapsed time between start and stop
+  - Updated `resetHeader()` to include `netStopped`
+- Updated `ncs-main-view.html`:
+  - Added collapsible header with toggle widget showing expand/collapse icon
+  - Header summary shown when collapsed (type, start time, stop time)
+  - Reorganized into timing row with Net Opened, Net Stopped, and Net Duration
+  - Made Net Opened and Net Stopped editable text inputs
+  - Button changes between "Start" (primary/blue) and "Stop" (warn/red)
+  - Button disabled after net is stopped
+- Updated `ncs-main-view.css`:
+  - Added `.header-toggle` styles for clickable collapse widget
+  - Added `.header-summary` for collapsed state info
+  - Added `.header-content` wrapper for collapsible content
+  - Added `.header-timing-row` for timing fields layout
+  - Added `.timing-group`, `.timing-input`, `.start-stop-btn` styles
+  - Added `.duration-value` for displaying computed duration
+  - Removed unused `.net-opened-group`, `.net-opened-value`, `.start-btn` classes

@@ -39,7 +39,7 @@ interface EditableEntry extends MainViewEntry {
   styleUrl: './ncs-main-view.css',
 })
 export class NcsMainView implements OnInit, OnDestroy {
-  displayedColumns: string[] = ['call', 'first', 'lastInitial', 'assignment1', 'status1', 'status2', 'status3', 'status4', 'actions'];
+  displayedColumns: string[] = ['call', 'first', 'lastInitial', 'assignment1', 'status1', 'status2', 'status3', 'status4', 'assignment2', 'status5', 'status6', 'status7', 'status8', 'notes', 'actions'];
   dataSource!: MatTableDataSource<EditableEntry>;
   entries: EditableEntry[] = [];
   addEntryPlaceholder: EditableEntry = this.createEmptyEntry();
@@ -49,11 +49,13 @@ export class NcsMainView implements OnInit, OnDestroy {
     netControlOp: '',
     type: '',
     netOpened: '',
+    netStopped: '',
     reasonForNet: '',
     comments: ''
   };
 
   netTypes: string[] = ['Training', 'Emergency', 'Weekly', 'Special Event', 'Drill'];
+  headerCollapsed: boolean = false;
 
   currentNetId: string = '';
   currentNetName: string = '';
@@ -109,7 +111,13 @@ export class NcsMainView implements OnInit, OnDestroy {
       status1: '',
       status2: '',
       status3: '',
-      status4: ''
+      status4: '',
+      assignment2: '',
+      status5: '',
+      status6: '',
+      status7: '',
+      status8: '',
+      notes: ''
     };
   }
 
@@ -191,6 +199,7 @@ export class NcsMainView implements OnInit, OnDestroy {
       netControlOp: '',
       type: '',
       netOpened: '',
+      netStopped: '',
       reasonForNet: '',
       comments: ''
     };
@@ -215,11 +224,52 @@ export class NcsMainView implements OnInit, OnDestroy {
   }
 
   // Header actions
-  startNewNet(): void {
+  toggleHeader(): void {
+    this.headerCollapsed = !this.headerCollapsed;
+  }
+
+  isNetRunning(): boolean {
+    return !!this.header.netOpened && !this.header.netStopped;
+  }
+
+  toggleNetStatus(): void {
     if (!this.canEdit) return;
     const now = new Date();
-    this.header.netOpened = now.toLocaleString();
+    if (!this.header.netOpened) {
+      // Start the net
+      this.header.netOpened = now.toLocaleString();
+    } else if (!this.header.netStopped) {
+      // Stop the net
+      this.header.netStopped = now.toLocaleString();
+    }
     this.saveHeader();
+  }
+
+  getNetDuration(): string {
+    if (!this.header.netOpened) return '';
+
+    const startDate = new Date(this.header.netOpened);
+    if (isNaN(startDate.getTime())) return '';
+
+    let endDate: Date;
+    if (this.header.netStopped) {
+      endDate = new Date(this.header.netStopped);
+      if (isNaN(endDate.getTime())) return '';
+    } else {
+      endDate = new Date();
+    }
+
+    const diffMs = endDate.getTime() - startDate.getTime();
+    if (diffMs < 0) return '';
+
+    const diffMins = Math.floor(diffMs / 60000);
+    const hours = Math.floor(diffMins / 60);
+    const mins = diffMins % 60;
+
+    if (hours > 0) {
+      return `${hours}h ${mins}m`;
+    }
+    return `${mins}m`;
   }
 
   saveHeader(): void {
@@ -302,6 +352,12 @@ export class NcsMainView implements OnInit, OnDestroy {
       status2: this.addEntryPlaceholder.status2 || '',
       status3: this.addEntryPlaceholder.status3 || '',
       status4: this.addEntryPlaceholder.status4 || '',
+      assignment2: this.addEntryPlaceholder.assignment2 || '',
+      status5: this.addEntryPlaceholder.status5 || '',
+      status6: this.addEntryPlaceholder.status6 || '',
+      status7: this.addEntryPlaceholder.status7 || '',
+      status8: this.addEntryPlaceholder.status8 || '',
+      notes: this.addEntryPlaceholder.notes || '',
       timeIn: new Date().toLocaleTimeString()
     };
 
@@ -332,7 +388,13 @@ export class NcsMainView implements OnInit, OnDestroy {
         status1: entry.status1,
         status2: entry.status2,
         status3: entry.status3,
-        status4: entry.status4
+        status4: entry.status4,
+        assignment2: entry.assignment2,
+        status5: entry.status5,
+        status6: entry.status6,
+        status7: entry.status7,
+        status8: entry.status8,
+        notes: entry.notes
       };
       this.firebaseService.updateMainViewEntry(this.currentNetId, entry.id, updateData).catch(error => {
         console.error('Error saving entry:', error);
