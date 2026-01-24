@@ -3,6 +3,7 @@
     ".read": "auth != null",
 
     "nets": {
+      ".write": "auth != null && (auth.token.email == 'matt.n3pay@gmail.com' || root.child('userGroups').child(auth.token.email.replace('.', ',')).child('DCARES').val() == true)",
       "$netId": {
         ".write": "auth != null && (
           auth.token.email == 'matt.n3pay@gmail.com' ||
@@ -49,6 +50,7 @@
     },
 
     "users": {
+      ".write": "auth != null && (auth.token.email == 'matt.n3pay@gmail.com' || root.child('userGroups').child(auth.token.email.replace('.', ',')).child('DCARES').val() == true)",
       "$sanitizedEmail": {
         ".write": "auth != null && (
           auth.token.email.replace('.', ',') == $sanitizedEmail ||
