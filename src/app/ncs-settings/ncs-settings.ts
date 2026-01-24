@@ -61,7 +61,6 @@ export class NcsSettings implements OnInit {
   filteredUsers: AppUser[] = [];
 
   // Backup
-  backupFormat: 'json' | 'csv' = 'json';
   isBackingUp: boolean = false;
   backupError: string = '';
 
@@ -352,26 +351,32 @@ export class NcsSettings implements OnInit {
       const zip = new JSZip();
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
 
-      if (this.backupFormat === 'json') {
+      // Create folders
+      const jsonFolder = zip.folder(`json-${timestamp}`);
+      const csvFolder = zip.folder(`csv-${timestamp}`);
+
+      if (jsonFolder) {
         // Add JSON files
-        zip.file('nets.json', JSON.stringify(data.nets, null, 2));
-        zip.file('people.json', JSON.stringify(data.people, null, 2));
-        zip.file('groups.json', JSON.stringify(data.groups, null, 2));
-        zip.file('groupMembers.json', JSON.stringify(data.groupMembers, null, 2));
-        zip.file('users.json', JSON.stringify(data.users, null, 2));
-        zip.file('userGroups.json', JSON.stringify(data.userGroups, null, 2));
-        zip.file('duties.json', JSON.stringify(data.duties, null, 2));
-        zip.file('locations.json', JSON.stringify(data.locations, null, 2));
-      } else {
+        jsonFolder.file('nets.json', JSON.stringify(data.nets, null, 2));
+        jsonFolder.file('people.json', JSON.stringify(data.people, null, 2));
+        jsonFolder.file('groups.json', JSON.stringify(data.groups, null, 2));
+        jsonFolder.file('groupMembers.json', JSON.stringify(data.groupMembers, null, 2));
+        jsonFolder.file('users.json', JSON.stringify(data.users, null, 2));
+        jsonFolder.file('userGroups.json', JSON.stringify(data.userGroups, null, 2));
+        jsonFolder.file('duties.json', JSON.stringify(data.duties, null, 2));
+        jsonFolder.file('locations.json', JSON.stringify(data.locations, null, 2));
+      }
+
+      if (csvFolder) {
         // Add CSV files
-        zip.file('nets.csv', this.convertToCSV(data.nets));
-        zip.file('people.csv', this.convertToCSV(data.people));
-        zip.file('groups.csv', this.convertToCSV(data.groups));
-        zip.file('groupMembers.csv', this.convertToCSV(data.groupMembers));
-        zip.file('users.csv', this.convertToCSV(data.users));
-        zip.file('userGroups.csv', this.convertToCSV(data.userGroups));
-        zip.file('duties.csv', this.convertToCSV(data.duties));
-        zip.file('locations.csv', this.convertToCSV(data.locations));
+        csvFolder.file('nets.csv', this.convertToCSV(data.nets));
+        csvFolder.file('people.csv', this.convertToCSV(data.people));
+        csvFolder.file('groups.csv', this.convertToCSV(data.groups));
+        csvFolder.file('groupMembers.csv', this.convertToCSV(data.groupMembers));
+        csvFolder.file('users.csv', this.convertToCSV(data.users));
+        csvFolder.file('userGroups.csv', this.convertToCSV(data.userGroups));
+        csvFolder.file('duties.csv', this.convertToCSV(data.duties));
+        csvFolder.file('locations.csv', this.convertToCSV(data.locations));
 
         // For nets with entries, create separate CSV files
         for (const net of data.nets) {
@@ -382,7 +387,7 @@ export class NcsSettings implements OnInit {
             }));
             if (entries.length > 0) {
               const safeName = net.name?.replace(/[^a-zA-Z0-9]/g, '_') || net.id;
-              zip.file(`net_entries_${safeName}.csv`, this.convertToCSV(entries));
+              csvFolder.file(`net_entries_${safeName}.csv`, this.convertToCSV(entries));
             }
           }
         }
