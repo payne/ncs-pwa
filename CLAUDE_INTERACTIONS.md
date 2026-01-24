@@ -587,3 +587,12 @@ Great! In the settings route add a bit to adjust the thickness of the grid lines
 *(New interactions will be appended below)*
 
 ---
+
+### Interaction 36: Full Grid Lines (Horizontal and Vertical)
+**User Prompt:**
+Ensure the grid line thickness setting applies to both horizontal and vertical grid lines in the tables.
+
+**Claude Actions:**
+- Updated `ncs-view2.css` to apply `--grid-line-thickness` to `border-bottom` in addition to `border-right`.
+- Updated `ncs-net-assignments.css` to apply `--grid-line-thickness` to `border-bottom` in addition to `border-right`.
+- Verified visually that the full grid is rendered with the configurable thickness.
