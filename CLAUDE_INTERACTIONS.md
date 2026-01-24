@@ -596,3 +596,98 @@ Ensure the grid line thickness setting applies to both horizontal and vertical g
 - Updated `ncs-view2.css` to apply `--grid-line-thickness` to `border-bottom` in addition to `border-right`.
 - Updated `ncs-net-assignments.css` to apply `--grid-line-thickness` to `border-bottom` in addition to `border-right`.
 - Verified visually that the full grid is rendered with the configurable thickness.
+
+---
+
+### Interaction 37: Create Main View Component
+**User Prompt:**
+Create `/ncs-main-view` and put it right after `Select NET` in the hamburger menu. This component will also be an editable table. New people are checked in by entering their callsign in the first row. All rows can be live updated by clicking on a cell and editing it. On top is a component with `Net Control Op:`, `Type` (a drop down), `Net Opened:` (a date & time stamp) that is set when the `Start New NET` button is clicked, `Reason for Net:` (one line of free text), `Comments:` a three line text area that takes most of the width of the component. Columns in the table include: 1. Call 2. First 3. Last Initial 4. Assignment 1 5. Four single letter status indicators (background color varies based on the letter entered)
+
+**Claude Actions:**
+- Created `src/app/_models/ncs-main-view.model.ts` with interfaces:
+  - `MainViewEntry` (id, call, first, lastInitial, assignment1, status1-4, timeIn)
+  - `MainViewHeader` (netControlOp, type, netOpened, reasonForNet, comments)
+- Created `src/app/ncs-main-view/ncs-main-view.ts` component:
+  - Header section with Net Control Op, Type dropdown, Net Opened timestamp, Reason, Comments textarea
+  - Start button that sets netOpened timestamp
+  - Editable table with callsign autocomplete from people collection
+  - Status columns with color-coded backgrounds (P=green, A=red, L=yellow, E=blue, X=gray)
+  - Read-only mode for users not in same group as NET creator
+  - Inline editing with auto-save on blur
+- Created `src/app/ncs-main-view/ncs-main-view.html`:
+  - Header section with responsive form fields
+  - Autocomplete dropdown for callsign entry
+  - Table with all 8 data columns plus actions
+  - Status legend showing color meanings
+- Created `src/app/ncs-main-view/ncs-main-view.css`:
+  - Styling for header section with form fields
+  - Grid lines using `--grid-line-thickness` CSS variable
+  - Status color classes (status-present, status-absent, status-late, status-excused, status-checked-out)
+  - Responsive media queries
+- Added to `firebase.service.ts`:
+  - `getMainViewEntries()` - Observable for main view entries
+  - `addMainViewEntry()` - Add new entry
+  - `updateMainViewEntry()` - Update existing entry
+  - `deleteMainViewEntry()` - Delete entry
+  - `getMainViewHeader()` - Observable for header data
+  - `saveMainViewHeader()` - Save header data
+- Updated `app.routes.ts`:
+  - Added import for `NcsMainView`
+  - Added route `/ncs-main-view` with `netAccessGuard`
+- Updated `app.ts`:
+  - Added "Main View" menu item with `checklist` icon right after "Select NET"
+
+---
+
+### Interaction 38: Add More Columns to Main View
+**User Prompt:**
+Add these columns to the right of the table (but before the `+` for add):
+1. 2nd Assignment
+2. Four more single letter columns
+3. Notes
+
+**Claude Actions:**
+- Updated `ncs-main-view.model.ts`:
+  - Added fields: `assignment2`, `status5`, `status6`, `status7`, `status8`, `notes`
+- Updated `ncs-main-view.ts`:
+  - Added new columns to `displayedColumns` array
+  - Updated `createEmptyEntry()` to include new fields
+  - Updated `addEntry()` to include new fields when creating entries
+  - Updated `saveEntry()` to include new fields when saving
+- Updated `ncs-main-view.html`:
+  - Added column definitions for assignment2, status5-8, and notes
+  - All columns placed between status4 and actions column
+- Updated `ncs-main-view.css`:
+  - Added `.notes-input` class with `min-width: 120px` for wider notes field
+
+---
+
+### Interaction 39: Net Start/Stop and Collapsible Header
+**User Prompt:**
+When I click the `Start` button in `/ncs-main-view` fill in the date and time stamp next to the `Net Opened:` label. Change the button from `Start` to `Stop`. Add two labels under the `Net Opened:` label: `Net Stopped:` and `Net Duration`. Compute the net duration and fill it in. The values of both `Net Opened:` and `Net Stopped:` should be able to be edited. The header with `Net Control Op:` through `Comments` should be a rectangle that can be hidden or shown by clicking a widget.
+
+**Claude Actions:**
+- Updated `ncs-main-view.model.ts`:
+  - Added `netStopped` field to `MainViewHeader` interface
+- Updated `ncs-main-view.ts`:
+  - Added `headerCollapsed` property for collapsible header state
+  - Added `toggleHeader()` method to show/hide header content
+  - Added `isNetRunning()` helper to check if net is active
+  - Replaced `startNewNet()` with `toggleNetStatus()` that handles both start and stop
+  - Added `getNetDuration()` method to compute elapsed time between start and stop
+  - Updated `resetHeader()` to include `netStopped`
+- Updated `ncs-main-view.html`:
+  - Added collapsible header with toggle widget showing expand/collapse icon
+  - Header summary shown when collapsed (type, start time, stop time)
+  - Reorganized into timing row with Net Opened, Net Stopped, and Net Duration
+  - Made Net Opened and Net Stopped editable text inputs
+  - Button changes between "Start" (primary/blue) and "Stop" (warn/red)
+  - Button disabled after net is stopped
+- Updated `ncs-main-view.css`:
+  - Added `.header-toggle` styles for clickable collapse widget
+  - Added `.header-summary` for collapsed state info
+  - Added `.header-content` wrapper for collapsible content
+  - Added `.header-timing-row` for timing fields layout
+  - Added `.timing-group`, `.timing-input`, `.start-stop-btn` styles
+  - Added `.duration-value` for displaying computed duration
+  - Removed unused `.net-opened-group`, `.net-opened-value`, `.start-btn` classes

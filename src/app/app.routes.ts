@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { NcsNetAssignments } from './ncs-net-assignments/ncs-net-assignments';
 import { NcsSelectNet } from './ncs-select-net/ncs-select-net';
+import { NcsMainView } from './ncs-main-view/ncs-main-view';
 import { NcsPeople } from './ncs-people/ncs-people';
 import { NcsLocations } from './ncs-locations/ncs-locations';
 import { NcsDuties } from './ncs-duties/ncs-duties';
@@ -18,6 +19,7 @@ export const routes: Routes = [
   { path: '', redirectTo: '/ncs-net-assignments', pathMatch: 'full' },
   { path: 'login', component: NcsLogin },
   { path: 'ncs-select-net', component: NcsSelectNet, canActivate: [groupMemberGuard] },
+  { path: 'ncs-main-view', component: NcsMainView, canActivate: [netAccessGuard] },
   { path: 'ncs-net-assignments', component: NcsNetAssignments, canActivate: [netAccessGuard] },
   { path: 'ncs-view2', component: NcsView2, canActivate: [netAccessGuard] },
   { path: 'ncs-people', component: NcsPeople, canActivate: [groupMemberGuard] },

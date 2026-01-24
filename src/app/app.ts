@@ -21,6 +21,7 @@ export class App implements OnInit {
 
   menuItems = [
     { path: '/ncs-select-net', label: 'Select NET', icon: 'dns', action: null, requiresAdmin: false },
+    { path: '/ncs-main-view', label: 'Main View', icon: 'checklist', action: null, requiresAdmin: false },
     { path: '/ncs-net-assignments', label: 'NET Assignments', icon: 'assignment', action: null, requiresAdmin: false },
     { path: '/ncs-view2', label: 'View 2', icon: 'table_chart', action: null, requiresAdmin: false },
     { path: '/ncs-people', label: 'People', icon: 'people', action: null, requiresAdmin: false },
