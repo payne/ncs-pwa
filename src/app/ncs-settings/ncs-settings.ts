@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatSortModule, MatSort } from '@angular/material/sort';
 import { MatInputModule } from '@angular/material/input';
@@ -72,15 +73,25 @@ export class NcsSettings implements OnInit {
   // Display Settings
   gridLineThickness: number = 1;
 
+  // UI State
+  showDangerZone: boolean = false;
+
   @ViewChild('groupSort') groupSort!: MatSort;
 
-  constructor(private firebaseService: FirebaseService) {}
+  constructor(
+    private firebaseService: FirebaseService,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
     this.groupDataSource = new MatTableDataSource<EditableGroup>([this.addGroupPlaceholder]);
     this.loadGroups();
     this.loadUsers();
     this.initGridLineThickness();
+
+    this.route.queryParams.subscribe(params => {
+      this.showDangerZone = params['danger'] === 'true';
+    });
   }
 
   initGridLineThickness(): void {
