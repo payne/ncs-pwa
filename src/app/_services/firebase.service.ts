@@ -556,16 +556,24 @@ export class FirebaseService {
     const ADMIN_GROUP_NAME = 'DCARES';
 
     // Delete all collections
-    await Promise.all([
-      remove(ref(this.db, 'nets')),
-      remove(ref(this.db, 'people')),
-      remove(ref(this.db, 'groups')),
-      remove(ref(this.db, 'groupMembers')),
-      remove(ref(this.db, 'users')),
-      remove(ref(this.db, 'userGroups')),
-      remove(ref(this.db, 'duties')),
-      remove(ref(this.db, 'locations'))
-    ]);
+    try {
+      // Delete content collections first while permissions (userGroups) are still intact
+      await Promise.all([
+        remove(ref(this.db, 'nets')),
+        remove(ref(this.db, 'people')),
+        remove(ref(this.db, 'groups')),
+        remove(ref(this.db, 'groupMembers')),
+        remove(ref(this.db, 'users')),
+        remove(ref(this.db, 'duties')),
+        remove(ref(this.db, 'locations'))
+      ]);
+
+      // Delete userGroups last
+      await remove(ref(this.db, 'userGroups'));
+    } catch (error) {
+      console.error('Detailed error during collection deletion:', error);
+      throw error;
+    }
 
     // Initialize users with admin user
     const sanitizedEmail = ADMIN_EMAIL.replace(/\./g, ',');
