@@ -38,6 +38,7 @@ export class App implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.initUserPreferences();
     this.authService.getAuthState().subscribe(user => {
       if (user) {
         this.checkAdminStatus();
@@ -45,6 +46,14 @@ export class App implements OnInit {
         this.isAdmin = false;
       }
     });
+  }
+
+  initUserPreferences(): void {
+    // Initialize grid line thickness
+    const savedThickness = localStorage.getItem('gridLineThickness');
+    if (savedThickness) {
+      document.documentElement.style.setProperty('--grid-line-thickness', `${savedThickness}px`);
+    }
   }
 
   async checkAdminStatus(): Promise<void> {

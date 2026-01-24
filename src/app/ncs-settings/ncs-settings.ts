@@ -13,6 +13,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSliderModule } from '@angular/material/slider';
 import { FirebaseService } from '../_services/firebase.service';
 import { Group, GroupMember, EditableGroup, AppUser } from '../_models/ncs-settings.model';
 import JSZip from 'jszip';
@@ -33,7 +34,8 @@ import JSZip from 'jszip';
     MatSelectModule,
     MatChipsModule,
     MatAutocompleteModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatSliderModule
   ],
   templateUrl: './ncs-settings.html',
   styleUrl: './ncs-settings.css',
@@ -67,6 +69,9 @@ export class NcsSettings implements OnInit {
   resetError: string = '';
   showResetConfirm: boolean = false;
 
+  // Display Settings
+  gridLineThickness: number = 1;
+
   @ViewChild('groupSort') groupSort!: MatSort;
 
   constructor(private firebaseService: FirebaseService) {}
@@ -75,6 +80,20 @@ export class NcsSettings implements OnInit {
     this.groupDataSource = new MatTableDataSource<EditableGroup>([this.addGroupPlaceholder]);
     this.loadGroups();
     this.loadUsers();
+    this.initGridLineThickness();
+  }
+
+  initGridLineThickness(): void {
+    const savedThickness = localStorage.getItem('gridLineThickness');
+    if (savedThickness) {
+      this.gridLineThickness = parseInt(savedThickness, 10);
+    }
+  }
+
+  updateGridLineThickness(value: number): void {
+    this.gridLineThickness = value;
+    localStorage.setItem('gridLineThickness', value.toString());
+    document.documentElement.style.setProperty('--grid-line-thickness', `${value}px`);
   }
 
   loadUsers(): void {
