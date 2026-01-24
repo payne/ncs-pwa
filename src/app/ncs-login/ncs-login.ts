@@ -24,7 +24,7 @@ export class NcsLogin {
     this.errorMessage = '';
     this.authService.signInWithGoogle()
       .then(() => {
-        this.router.navigate(['/ncs-net-assignments']);
+        this.router.navigate(['/ncs-main-view']);
       })
       .catch((error) => {
         this.errorMessage = 'Failed to sign in. Please try again.';
