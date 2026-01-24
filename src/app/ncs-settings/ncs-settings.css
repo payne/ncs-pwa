@@ -355,6 +355,27 @@ table {
   margin: 0;
 }
 
+/* User Preferences */
+.preferences-controls {
+  padding: 0.5rem 0;
+}
+
+.preference-item {
+  margin-bottom: 1.5rem;
+}
+
+.preference-label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--color-dark);
+}
+
+mat-slider {
+  width: 100%;
+  max-width: 400px;
+}
+
 @media (min-width: 576px) {
   .filter-input {
     width: 180px;

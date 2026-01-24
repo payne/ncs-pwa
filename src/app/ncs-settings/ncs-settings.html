@@ -203,6 +203,28 @@
     </div>
   </div>
 
+  <!-- User Preferences Section -->
+  <div class="row">
+    <div class="col-12">
+      <div class="section-card">
+        <div class="section-header">
+          <h2>User Preferences</h2>
+        </div>
+
+        <div class="preferences-controls">
+          <div class="preference-item">
+            <label class="preference-label">Table Grid Line Thickness: {{ gridLineThickness }}px</label>
+            <mat-slider min="0" max="5" step="1" showTickMarks discrete>
+              <input matSliderThumb
+                     [value]="gridLineThickness"
+                     (valueChange)="updateGridLineThickness($event)">
+            </mat-slider>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Reset Data Section -->
   <div class="row">
     <div class="col-12">

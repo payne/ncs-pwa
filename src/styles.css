@@ -13,6 +13,7 @@
   --color-dark: #343a40;
   --color-white: #ffffff;
   --color-black: #000000;
+  --grid-line-thickness: 1px;
 }
 
 /* Global Styles */

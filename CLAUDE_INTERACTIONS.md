@@ -556,8 +556,43 @@ Change `database.rules.json` to reflect the fact that to write to the nets docum
 
 ---
 
+### Interaction 34: Add Grid Lines to Tables
+**User Prompt:**
+Add grid lines to the tables in both of these routes `/ncs-view2` and `/ncs-net-assignments`
+
+**Claude Actions:**
+- Updated `ncs-view2.css` to add vertical borders to table cells using `::ng-deep` to target Material components
+- Updated `ncs-net-assignments.css` to add vertical borders to table cells using `::ng-deep` to target Material components
+- Verified visually using Playwright script that grid lines are present in both views
+
+---
+
+### Interaction 35: Adjustable Grid Line Thickness
+**User Prompt:**
+Great! In the settings route add a bit to adjust the thickness of the grid lines.
+
+**Claude Actions:**
+- Added CSS variable `--grid-line-thickness` to `styles.css`
+- Updated `ncs-view2.css` and `ncs-net-assignments.css` to use the CSS variable
+- Added `MatSliderModule` to `ncs-settings.ts`
+- Added grid line thickness slider to User Preferences section in `ncs-settings.html`
+- Implemented logic in `ncs-settings.ts` to save setting to localStorage and update CSS variable
+- Updated `app.ts` to initialize the CSS variable from localStorage on app startup
+- Verified CSS variable application using Playwright script
+
+---
+
 ## Future Interactions
 
 *(New interactions will be appended below)*
 
 ---
+
+### Interaction 36: Full Grid Lines (Horizontal and Vertical)
+**User Prompt:**
+Ensure the grid line thickness setting applies to both horizontal and vertical grid lines in the tables.
+
+**Claude Actions:**
+- Updated `ncs-view2.css` to apply `--grid-line-thickness` to `border-bottom` in addition to `border-right`.
+- Updated `ncs-net-assignments.css` to apply `--grid-line-thickness` to `border-bottom` in addition to `border-right`.
+- Verified visually that the full grid is rendered with the configurable thickness.
