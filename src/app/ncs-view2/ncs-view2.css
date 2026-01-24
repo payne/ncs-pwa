@@ -123,6 +123,17 @@ table {
   padding: 0.35rem 0.4rem;
 }
 
+/* Grid lines */
+:host ::ng-deep .mat-mdc-header-cell,
+:host ::ng-deep .mat-mdc-cell {
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+:host ::ng-deep .mat-mdc-header-cell:last-child,
+:host ::ng-deep .mat-mdc-cell:last-child {
+  border-right: none;
+}
+
 :host ::ng-deep .mat-mdc-row {
   min-height: 40px;
 }

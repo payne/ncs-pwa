@@ -556,6 +556,17 @@ Change `database.rules.json` to reflect the fact that to write to the nets docum
 
 ---
 
+### Interaction 34: Add Grid Lines to Tables
+**User Prompt:**
+Add grid lines to the tables in both of these routes `/ncs-view2` and `/ncs-net-assignments`
+
+**Claude Actions:**
+- Updated `ncs-view2.css` to add vertical borders to table cells using `::ng-deep` to target Material components
+- Updated `ncs-net-assignments.css` to add vertical borders to table cells using `::ng-deep` to target Material components
+- Verified visually using Playwright script that grid lines are present in both views
+
+---
+
 ## Future Interactions
 
 *(New interactions will be appended below)*
