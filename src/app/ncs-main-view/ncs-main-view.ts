@@ -183,7 +183,15 @@ export class NcsMainView implements OnInit, OnDestroy {
     this.headerSubscription = this.firebaseService.getMainViewHeader(this.currentNetId).subscribe({
       next: (header) => {
         if (header) {
-          this.header = header;
+          // Ensure all fields have default values
+          this.header = {
+            netControlOp: header.netControlOp || '',
+            type: header.type || '',
+            netOpened: header.netOpened || '',
+            netStopped: header.netStopped || '',
+            reasonForNet: header.reasonForNet || '',
+            comments: header.comments || ''
+          };
         } else {
           this.resetHeader();
         }
@@ -229,19 +237,20 @@ export class NcsMainView implements OnInit, OnDestroy {
   }
 
   isNetRunning(): boolean {
-    return !!this.header.netOpened && !this.header.netStopped;
+    return this.header.netOpened !== '' && this.header.netStopped === '';
   }
 
-  toggleNetStatus(): void {
+  startNet(): void {
     if (!this.canEdit) return;
     const now = new Date();
-    if (!this.header.netOpened) {
-      // Start the net
-      this.header.netOpened = now.toLocaleString();
-    } else if (!this.header.netStopped) {
-      // Stop the net
-      this.header.netStopped = now.toLocaleString();
-    }
+    this.header.netOpened = now.toLocaleString();
+    this.saveHeader();
+  }
+
+  stopNet(): void {
+    if (!this.canEdit) return;
+    const now = new Date();
+    this.header.netStopped = now.toLocaleString();
     this.saveHeader();
   }
 

@@ -70,12 +70,22 @@
                      [disabled]="!canEdit"
                      placeholder="Not started">
               <button mat-raised-button
-                      [color]="isNetRunning() ? 'warn' : 'primary'"
-                      (click)="toggleNetStatus()"
-                      [disabled]="!canEdit || (header.netOpened && header.netStopped)"
+                      color="primary"
+                      (click)="startNet()"
+                      *ngIf="!header.netOpened"
+                      [disabled]="!canEdit"
                       class="start-stop-btn">
-                <mat-icon>{{ isNetRunning() ? 'stop' : 'play_arrow' }}</mat-icon>
-                {{ isNetRunning() ? 'Stop' : 'Start' }}
+                <mat-icon>play_arrow</mat-icon>
+                Start
+              </button>
+              <button mat-raised-button
+                      color="warn"
+                      (click)="stopNet()"
+                      *ngIf="header.netOpened && !header.netStopped"
+                      [disabled]="!canEdit"
+                      class="start-stop-btn">
+                <mat-icon>stop</mat-icon>
+                Stop
               </button>
             </div>
           </div>
