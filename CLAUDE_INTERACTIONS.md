@@ -691,3 +691,54 @@ When I click the `Start` button in `/ncs-main-view` fill in the date and time st
   - Added `.timing-group`, `.timing-input`, `.start-stop-btn` styles
   - Added `.duration-value` for displaying computed duration
   - Removed unused `.net-opened-group`, `.net-opened-value`, `.start-btn` classes
+
+---
+
+## Session: 2026-01-25
+
+### Interaction 40: Create Reusable Callsign Lookup Service
+**User Prompt:**
+Create a reusable service that returns a person's last name and first name based on their call sign. There should also be a function that takes part of a call sign and returns a list of matches. Each match should have the call sign, first name, and last name. This service should use call sign information stored in local storage. The very first time it runs it will download https://raw.githubusercontent.com/payne/ham-radio-data/refs/heads/main/people.csv, and store that information in local storage (or IndexedDB) in a way that works for fast lookups. When the service runs after the first time, it should notice that the local storage is already setup and not do a fresh download of people.csv.
+
+**Claude Actions:**
+- Created `src/app/_models/callsign-lookup.model.ts`:
+  - `CallsignEntry` interface (callSign, firstName, lastName)
+  - `CallsignLookupResult` interface (callSign, firstName, lastName, fullName)
+- Created `src/app/_services/callsign-lookup.service.ts`:
+  - Uses IndexedDB for efficient storage of large dataset (10MB+ CSV)
+  - `initialize()` - Checks if data exists, downloads CSV if not
+  - `lookupCallsign(callSign)` - Exact match lookup, returns person info or null
+  - `searchCallsigns(partialCallSign, maxResults)` - Prefix search, returns list of matches
+  - `getFormattedName(callSign)` - Returns "LastName, FirstName" format
+  - `refreshData()` - Force re-download of CSV data
+  - CSV parsing handles quoted fields (e.g., names with commas)
+  - Batched storage (5000 records at a time) to avoid UI blocking
+  - IndexedDB index on callSignUpper for efficient prefix searches
+
+---
+
+### Interaction 41: Integrate Callsign Lookup Service in NET Assignments
+**User Prompt:**
+Use this service in the `/ncs-net-assignments` route
+
+**Claude Actions:**
+- Updated `ncs-net-assignments.ts`:
+  - Imported `CallsignLookupService` and `CallsignLookupResult`
+  - Injected `CallsignLookupService` in constructor
+  - Added `filteredCallsigns` and `combinedResults` properties
+  - Added `initializeCallsignDatabase()` method called on init
+  - Updated `onSearchOperator()` to search both local operators and callsign database
+  - Combined results show local operators first, then database results (excluding duplicates)
+  - Added `selectResult()` method to handle selection from combined results
+  - Updated `selectNextOperator()`, `selectPreviousOperator()`, `selectCurrentOperator()` to use combined results
+- Updated `ncs-net-assignments.html`:
+  - Autocomplete dropdown now uses `combinedResults` instead of `filteredOperators`
+  - Added source indicators: group icon for local club members, globe icon for FCC database
+  - Results from database have a subtle blue background
+- Updated `ncs-net-assignments.css`:
+  - Added flexbox layout for autocomplete items
+  - Added `.result-callsign`, `.result-name`, `.result-source` classes
+  - Added `.source-icon` styling for the indicator icons
+  - Added `.from-database` class for database results with blue background
+
+---

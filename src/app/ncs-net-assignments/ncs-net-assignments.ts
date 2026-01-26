@@ -17,8 +17,10 @@ import { OperatorService } from '../_services/operator.service';
 import { StorageService } from '../_services/storage.service';
 import { FirebaseService } from '../_services/firebase.service';
 import { PermissionService } from '../_services/permission.service';
+import { CallsignLookupService } from '../_services/callsign-lookup.service';
 import { NetEntry } from '../_models/net-entry.model';
 import { Operator } from '../_models/operator.model';
+import { CallsignLookupResult } from '../_models/callsign-lookup.model';
 
 @Component({
   selector: 'app-ncs-net-assignments',
@@ -57,6 +59,8 @@ export class NcsNetAssignments implements OnInit {
   ];
   operators: Operator[] = [];
   filteredOperators: Operator[] = [];
+  filteredCallsigns: CallsignLookupResult[] = [];
+  combinedResults: Array<{callsign: string; name: string; source: 'local' | 'database'}> = [];
   selectedOperatorIndex: number = 0;
   autocompleteOffset: number = 0;
   selectedCallsignAlreadyAdded: boolean = false;
@@ -78,6 +82,7 @@ export class NcsNetAssignments implements OnInit {
     private storageService: StorageService,
     private firebaseService: FirebaseService,
     private permissionService: PermissionService,
+    private callsignLookupService: CallsignLookupService,
     private router: Router,
     private cdr: ChangeDetectorRef,
     private elementRef: ElementRef
@@ -100,11 +105,20 @@ export class NcsNetAssignments implements OnInit {
 
     this.initializeForm();
     this.loadOperators();
+    this.initializeCallsignDatabase();
     this.dataSource = new MatTableDataSource<any>([this.addRowPlaceholder]);
     this.configureSorting();
     this.configureFilter();
 
     this.selectNet(savedNetId);
+  }
+
+  async initializeCallsignDatabase(): Promise<void> {
+    try {
+      await this.callsignLookupService.initialize();
+    } catch (error) {
+      console.error('Error initializing callsign database:', error);
+    }
   }
 
   configureSorting(): void {
@@ -232,8 +246,42 @@ export class NcsNetAssignments implements OnInit {
     });
   }
 
-  onSearchOperator(searchValue: string): void {
+  async onSearchOperator(searchValue: string): Promise<void> {
+    if (!searchValue || searchValue.length < 2) {
+      this.combinedResults = [];
+      this.filteredOperators = [];
+      return;
+    }
+
+    // Search local operators (club members)
     this.filteredOperators = this.operatorService.searchOperators(searchValue, this.operators);
+
+    // Search the callsign database
+    try {
+      this.filteredCallsigns = await this.callsignLookupService.searchCallsigns(searchValue, 20);
+    } catch (error) {
+      console.error('Error searching callsign database:', error);
+      this.filteredCallsigns = [];
+    }
+
+    // Combine results: local operators first, then database results (excluding duplicates)
+    const localCallsigns = new Set(this.filteredOperators.map(op => op.callsign.toUpperCase()));
+
+    this.combinedResults = [
+      ...this.filteredOperators.map(op => ({
+        callsign: op.callsign,
+        name: op.name,
+        source: 'local' as const
+      })),
+      ...this.filteredCallsigns
+        .filter(cs => !localCallsigns.has(cs.callSign.toUpperCase()))
+        .map(cs => ({
+          callsign: cs.callSign,
+          name: `${cs.firstName} ${cs.lastName}`,
+          source: 'database' as const
+        }))
+    ];
+
     this.selectedOperatorIndex = 0;
     this.autocompleteOffset = 0;
     this.selectedCallsignAlreadyAdded = false;
@@ -246,7 +294,11 @@ export class NcsNetAssignments implements OnInit {
   }
 
   selectOperator(operator: Operator): void {
-    const alreadyAdded = this.isCallsignAlreadyAdded(operator.callsign);
+    this.selectResult({ callsign: operator.callsign, name: operator.name, source: 'local' });
+  }
+
+  selectResult(result: {callsign: string; name: string; source: 'local' | 'database'}): void {
+    const alreadyAdded = this.isCallsignAlreadyAdded(result.callsign);
 
     if (alreadyAdded) {
       this.selectedCallsignAlreadyAdded = true;
@@ -254,10 +306,11 @@ export class NcsNetAssignments implements OnInit {
     }
 
     this.assignmentForm.patchValue({
-      callsign: operator.callsign,
-      name: operator.name
+      callsign: result.callsign,
+      name: result.name
     });
     this.filteredOperators = [];
+    this.combinedResults = [];
     this.selectedOperatorIndex = 0;
     this.autocompleteOffset = 0;
     this.selectedCallsignAlreadyAdded = false;
@@ -272,13 +325,13 @@ export class NcsNetAssignments implements OnInit {
   }
 
   selectNextOperator(): void {
-    if (this.filteredOperators.length === 0) return;
+    if (this.combinedResults.length === 0) return;
 
-    const currentPage = this.filteredOperators.slice(this.autocompleteOffset, this.autocompleteOffset + 4);
+    const currentPage = this.combinedResults.slice(this.autocompleteOffset, this.autocompleteOffset + 4);
 
     if (this.selectedOperatorIndex < currentPage.length - 1) {
       this.selectedOperatorIndex++;
-    } else if (this.autocompleteOffset + 4 < this.filteredOperators.length) {
+    } else if (this.autocompleteOffset + 4 < this.combinedResults.length) {
       this.autocompleteOffset += 4;
       this.selectedOperatorIndex = 0;
     } else {
@@ -288,7 +341,7 @@ export class NcsNetAssignments implements OnInit {
   }
 
   selectPreviousOperator(): void {
-    if (this.filteredOperators.length === 0) return;
+    if (this.combinedResults.length === 0) return;
 
     if (this.selectedOperatorIndex > 0) {
       this.selectedOperatorIndex--;
@@ -296,21 +349,21 @@ export class NcsNetAssignments implements OnInit {
       this.autocompleteOffset -= 4;
       this.selectedOperatorIndex = 3;
     } else {
-      const lastPageOffset = Math.floor((this.filteredOperators.length - 1) / 4) * 4;
+      const lastPageOffset = Math.floor((this.combinedResults.length - 1) / 4) * 4;
       this.autocompleteOffset = lastPageOffset;
-      this.selectedOperatorIndex = Math.min(3, this.filteredOperators.length - lastPageOffset - 1);
+      this.selectedOperatorIndex = Math.min(3, this.combinedResults.length - lastPageOffset - 1);
     }
   }
 
   selectCurrentOperator(): void {
     const actualIndex = this.autocompleteOffset + this.selectedOperatorIndex;
-    if (this.filteredOperators.length > 0 && actualIndex < this.filteredOperators.length) {
-      this.selectOperator(this.filteredOperators[actualIndex]);
+    if (this.combinedResults.length > 0 && actualIndex < this.combinedResults.length) {
+      this.selectResult(this.combinedResults[actualIndex]);
     }
   }
 
   onCallsignKeydown(event: KeyboardEvent): void {
-    if (this.filteredOperators.length === 0) return;
+    if (this.combinedResults.length === 0) return;
 
     if (event.key === 'Tab') {
       event.preventDefault();
