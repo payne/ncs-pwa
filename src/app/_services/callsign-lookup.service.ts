@@ -229,29 +229,32 @@ export class CallsignLookupService {
    * Search for call signs that start with or contain the given partial string
    * @param partialCallSign The partial call sign to search for (case insensitive)
    * @param maxResults Maximum number of results to return (default 50)
-   * @returns Array of matching entries
+   * @returns Array of matching entries (prefix matches first, then contains matches)
    */
   async searchCallsigns(partialCallSign: string, maxResults: number = 50): Promise<CallsignLookupResult[]> {
     await this.initialize();
 
     const searchTerm = partialCallSign.toUpperCase();
-    const results: CallsignLookupResult[] = [];
+    const prefixResults: CallsignLookupResult[] = [];
+    const containsResults: CallsignLookupResult[] = [];
+    const seenCallsigns = new Set<string>();
 
-    return new Promise((resolve, reject) => {
+    // First, get prefix matches (fast, using index)
+    await new Promise<void>((resolve, reject) => {
       const transaction = this.db!.transaction([this.STORE_NAME], 'readonly');
       const store = transaction.objectStore(this.STORE_NAME);
       const index = store.index('callSignUpper');
 
-      // Use a cursor to search through entries
       const range = IDBKeyRange.bound(searchTerm, searchTerm + '\uffff');
       const request = index.openCursor(range);
 
       request.onsuccess = (event) => {
         const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
 
-        if (cursor && results.length < maxResults) {
+        if (cursor && prefixResults.length < maxResults) {
           const entry = cursor.value as CallsignEntry;
-          results.push({
+          seenCallsigns.add(entry.callSign);
+          prefixResults.push({
             callSign: entry.callSign,
             firstName: entry.firstName,
             lastName: entry.lastName,
@@ -259,14 +262,51 @@ export class CallsignLookupService {
           });
           cursor.continue();
         } else {
-          resolve(results);
+          resolve();
         }
       };
 
-      request.onerror = () => {
-        reject(new Error('Failed to search callsigns: ' + request.error?.message));
-      };
+      request.onerror = () => reject(new Error('Failed to search callsigns: ' + request.error?.message));
     });
+
+    // If we already have enough results from prefix search, return them
+    if (prefixResults.length >= maxResults) {
+      return prefixResults.slice(0, maxResults);
+    }
+
+    // Otherwise, scan for "contains" matches to fill remaining slots
+    const remainingSlots = maxResults - prefixResults.length;
+
+    await new Promise<void>((resolve, reject) => {
+      const transaction = this.db!.transaction([this.STORE_NAME], 'readonly');
+      const store = transaction.objectStore(this.STORE_NAME);
+      const request = store.openCursor();
+
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+
+        if (cursor && containsResults.length < remainingSlots) {
+          const entry = cursor.value as CallsignEntry;
+          // Check if callsign contains search term (but not as prefix, those are already included)
+          if (!seenCallsigns.has(entry.callSign) && entry.callSign.includes(searchTerm)) {
+            containsResults.push({
+              callSign: entry.callSign,
+              firstName: entry.firstName,
+              lastName: entry.lastName,
+              fullName: `${entry.lastName}, ${entry.firstName}`
+            });
+          }
+          cursor.continue();
+        } else {
+          resolve();
+        }
+      };
+
+      request.onerror = () => reject(new Error('Failed to search callsigns: ' + request.error?.message));
+    });
+
+    // Return prefix matches first, then contains matches
+    return [...prefixResults, ...containsResults];
   }
 
   /**

@@ -742,3 +742,20 @@ Use this service in the `/ncs-net-assignments` route
   - Added `.from-database` class for database results with blue background
 
 ---
+
+### Interaction 42: Support Contains Search for Callsigns
+**User Prompt:**
+There a bunch of callsigns in people.csv that include `sun` (case insensitive) as part of the callsign. Make it so when I type in sun these people come back as partial match.
+
+**Claude Actions:**
+- Updated `searchCallsigns()` in `callsign-lookup.service.ts`:
+  - Previously only matched callsigns that **start with** the search term (prefix match)
+  - Now matches callsigns that **contain** the search term anywhere
+  - Two-phase search for performance:
+    1. First phase: Fast prefix search using IndexedDB index (e.g., "SUN..." matches)
+    2. Second phase: Scan for contains matches (e.g., "K1SUN", "W3SUNNY")
+  - Prefix matches appear first in results, followed by contains matches
+  - Uses `Set` to avoid duplicate results
+  - Stops scanning once `maxResults` is reached
+
+---
