@@ -63,6 +63,38 @@
   cursor: pointer;
   border-bottom: 1px solid #eee;
   font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.result-callsign {
+  font-weight: 600;
+  min-width: 70px;
+}
+
+.result-name {
+  flex: 1;
+}
+
+.result-source {
+  display: flex;
+  align-items: center;
+}
+
+.source-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+}
+
+.autocomplete-item.from-database {
+  background-color: #f0f7ff;
+}
+
+.autocomplete-item.from-database.selected {
+  background-color: #3d6a99;
 }
 
 .autocomplete-item:hover {

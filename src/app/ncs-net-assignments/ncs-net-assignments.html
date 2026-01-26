@@ -27,16 +27,24 @@
   </div>
 
   <!-- Autocomplete dropdown for add row -->
-  <div class="autocomplete-dropdown" *ngIf="filteredOperators.length > 0">
-    <div class="autocomplete-header">{{ filteredOperators.length }} Matching Callsign{{ filteredOperators.length === 1 ? '' : 's' }}</div>
+  <div class="autocomplete-dropdown" *ngIf="combinedResults.length > 0">
+    <div class="autocomplete-header">{{ combinedResults.length }} Matching Callsign{{ combinedResults.length === 1 ? '' : 's' }}</div>
     <div class="autocomplete-results">
       <div
         class="autocomplete-item"
-        *ngFor="let operator of filteredOperators.slice(autocompleteOffset, autocompleteOffset + 4); let i = index"
+        *ngFor="let result of combinedResults.slice(autocompleteOffset, autocompleteOffset + 4); let i = index"
         [class.selected]="i === selectedOperatorIndex"
-        [class.already-added]="isCallsignAlreadyAdded(operator.callsign)"
-        (click)="selectOperator(operator)">
-        {{ operator.callsign }} - {{ operator.name }}
+        [class.already-added]="isCallsignAlreadyAdded(result.callsign)"
+        [class.from-database]="result.source === 'database'"
+        (click)="selectResult(result)">
+        <span class="result-callsign">{{ result.callsign }}</span>
+        <span class="result-name">{{ result.name }}</span>
+        <span class="result-source" *ngIf="result.source === 'local'" title="Club member">
+          <mat-icon class="source-icon">group</mat-icon>
+        </span>
+        <span class="result-source" *ngIf="result.source === 'database'" title="FCC database">
+          <mat-icon class="source-icon">public</mat-icon>
+        </span>
       </div>
     </div>
     <div class="already-added-message" *ngIf="selectedCallsignAlreadyAdded">
