@@ -175,14 +175,6 @@
         </p>
 
         <div class="backup-controls">
-          <mat-form-field appearance="outline" class="format-select">
-            <mat-label>File Format</mat-label>
-            <mat-select [(value)]="backupFormat">
-              <mat-option value="json">JSON</mat-option>
-              <mat-option value="csv">CSV</mat-option>
-            </mat-select>
-          </mat-form-field>
-
           <button mat-raised-button color="primary" (click)="downloadBackup()" [disabled]="isBackingUp">
             <mat-spinner *ngIf="isBackingUp" diameter="20" class="button-spinner"></mat-spinner>
             <mat-icon *ngIf="!isBackingUp">download</mat-icon>
@@ -196,8 +188,9 @@
         </div>
 
         <div class="backup-info">
-          <p><strong>JSON format:</strong> Best for restoring data or programmatic use. Preserves all data types and structure.</p>
-          <p><strong>CSV format:</strong> Best for viewing in spreadsheet applications. Each collection is saved as a separate file.</p>
+          <p>The backup will contain both JSON and CSV files, organized in dated folders.</p>
+          <p><strong>JSON:</strong> Best for restoring data or programmatic use. Preserves all data types and structure.</p>
+          <p><strong>CSV:</strong> Best for viewing in spreadsheet applications. Each collection is saved as a separate file.</p>
         </div>
       </div>
     </div>
